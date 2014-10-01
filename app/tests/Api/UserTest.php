@@ -54,6 +54,14 @@ class CourseTest extends TestCase
     const firstCourseName = 'Астрология';
     const secondCourseName = 'Физика';
 
+    public function createCourse($courseName)
+    {
+        $course = new Course();
+        $course->name = $courseName;
+        $course->save();
+        return $course;
+    }
+
     public function setUp()
     {
 
@@ -88,10 +96,7 @@ class CourseTest extends TestCase
     public function testCourseUpdate()
     {
 
-        $course = new Course();
-        $course->name = CourseTest::firstCourseName;
-        $course->save();
-
+        $course = CourseTest::createCourse(CourseTest::firstCourseName);
         $url = '/api/v1/course/' . $course->id;
 
         //Отсылка на ресурс с данным айдишником
@@ -114,13 +119,8 @@ class CourseTest extends TestCase
     public function testCourseList()
     {
 
-        $courseFirst = new Course();
-        $courseFirst->name = CourseTest::firstCourseName;
-        $courseFirst->save();
-
-        $courseSecond = new Course();
-        $courseSecond->name = CourseTest::secondCourseName;
-        $courseSecond->save();
+        $courseFirst = CourseTest::createCourse(CourseTest::firstCourseName);
+        $courseSecond = CourseTest::createCourse(CourseTest::secondCourseName);
 
         $url = '/api/v1/course/';
 
@@ -136,5 +136,23 @@ class CourseTest extends TestCase
 
     }
 
+    public function testCourseDelete()
+    {
 
+        $course = CourseTest::createCourse(CourseTest::firstCourseName);
+
+        $url = '/api/v1/course/' . $course->id;
+
+        $this->call('DELETE', $url);
+
+        $expectedResponse = "Course " . CourseTest::firstCourseName . " been successful deleted";
+        $response = json_decode($this->client->getResponse()->getContent());
+
+        //Сверка
+        $this->assertEquals($expectedResponse, $response);
+        //Проверка на существование
+        $this->assertEquals(Course::first(), null);
+
+
+    }
 }

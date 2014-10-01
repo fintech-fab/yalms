@@ -107,6 +107,8 @@ class CourseController extends BaseController
         $course = Course::find($id);
         $course ->delete();
 
-        return Response::json(array('status','Course'));
+        $status = 'Course ' . $course->name . ' been successful deleted';
+
+        return Response::json($status);
     }
 }
