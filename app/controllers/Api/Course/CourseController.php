@@ -84,7 +84,7 @@ class CourseController extends BaseController
         $course -> name = Input::get('name');
         $course->save();
 
-        $status = 'Course ' . $course->name . ' been successful update';
+        $status = 'Course ' . $course->name . ' been successful updated';
 
 
         return Response::json($status);
