@@ -16,6 +16,7 @@ namespace Yalms\Models\Courses;
  * @method static Course save()
  * @method static Course all()
  * @method static Course findOrFail($id)
+ * @method static Course paginate($id)
  *
  */
 class Course extends \Eloquent {

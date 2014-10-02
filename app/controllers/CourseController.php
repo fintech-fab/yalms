@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Symfony\Component\BrowserKit\Response;
+use Yalms\Component\Course\CourseComponent;
 use Yalms\Models\Courses\Course;
 
 class CourseController extends \BaseController
@@ -17,22 +19,8 @@ class CourseController extends \BaseController
      */
     public function index()
     {
-        $courses =  Course::get(array('name','id'));
-
-        //Вполне возможна ситуация по которой мы пришли в этот контроллер
-        //после редиректа от функции удаления.
-        //Тогда у нас есть некое статусное сообщение($message),
-        //которое необходимо отрисовать на странице.
-
-        {
-            $message = Session::get('message');
-        }
-        if (isset($message)) {
-            //Сообщение таки есть.Надо его показать пользователю
-            return View::make('pages.course.index', compact('message', 'courses'));
-        }
-
-        return View::make('pages.course.index')->with('courses', $courses);
+        $courses = CourseComponent::indexCourses();
+        return View::make('pages.course.index', compact('courses'));
     }
 
 
@@ -142,6 +130,10 @@ class CourseController extends \BaseController
         $message = 'Course ' . $courseName . ' been successful removed';
 
         //Отправим на заглавную страницу всех курсов
+        //после редиректа от функции удаления.
+        //Тогда у нас есть некое статусное сообщение($message),
+        //которое необходимо отрисовать на странице.
+
         return Redirect::action('CourseController@index')->with('message', $message);
     }
 }
