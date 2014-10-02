@@ -27,8 +27,13 @@
 		"psr-4": {
 			"Yalms\\Models\\": "app/models",
 			"Yalms\\Component\\": "app/component",
-			"Yalms\\Tests\\": "app/tests"
-		}
+			"Yalms\\Tests\\": "app/tests",
+            "Yalms\\Helpers\\": "app/helpers"
+		},
+        "files": [
+            "app/helpers/helpers.php"
+        ]
+
 	},
 	"scripts": {
 		"post-install-cmd": [
