@@ -9,5 +9,6 @@
         {{ link_to_route('course.show', $course->name, $course->id) }}
       </div>
     @endforeach
+    {{$courses->links()}}
 
 @include('includes.footer')

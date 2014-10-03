@@ -10,6 +10,15 @@ body {
 
   }
 
+  ul.pagination{
+      list-style: none;
+      text-align: left;
+      li{
+        display: inline
+      };
+  }
+
+
   & .message{
     background: #a9dd9b;
     color: #020304;

@@ -4,6 +4,7 @@ namespace app\controllers\Api\Course;
 use BaseController;
 use Illuminate\Support\Facades\Input;
 use Response;
+use Yalms\Component\Course\CourseComponent;
 use Yalms\Models\Courses\Course;
 
 
@@ -24,7 +25,7 @@ class CourseController extends BaseController
     {
 
 
-        $courses = Course::get(array('name','id'));
+        $courses = CourseComponent::indexCourses();
         return Response::json($courses);
     }
 
