@@ -89,8 +89,10 @@ class CourseTest extends TestCase
         $response = json_decode($this->client->getResponse()->getContent());
 
         //Сверка
-        $this->assertEquals($response[0]->name, $courseFirst->name);
-        $this->assertEquals($response[1]->name, $courseSecond->name);
+        $data =$response->data;
+
+        $this->assertEquals($data[0]->name, $courseFirst->name);
+        $this->assertEquals($data[1]->name, $courseSecond->name);
 
 
     }
