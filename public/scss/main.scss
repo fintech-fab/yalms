@@ -19,9 +19,18 @@ body {
   }
 
 
-  & .message{
-    background: #a9dd9b;
-    color: #020304;
+  & .success{
+    background: #bcdda9;
+    color: #055e01;
+    height: 30px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 0.3em;
+  }
+
+  & .fail{
+    background: rgba(214, 0, 6, 0.45);
+    color: #5e1c1f;
     height: 30px;
     margin: 10px;
     padding: 10px;

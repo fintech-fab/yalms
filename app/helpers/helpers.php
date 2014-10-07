@@ -11,7 +11,11 @@ use Illuminate\Support\Facades\Session;
  */
 function statusMessage()
 {
-    if (Session::has('message'))
-        return ('<div class="message">' . Session::get('message') . '</div>');
+    if (Session::has('status') && Session::has('message'))
+
+        //Есть статусное сообщение
+        //FIXME Сделать перенос в переменые и их подстановку.Более читаемо будет.
+        return ('<div class="' . Session::get('status') . '">' . Session::get('message') . '</div>');
 }
+
 ?>
