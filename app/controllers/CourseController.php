@@ -1,7 +1,6 @@
 <?php
 
 
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\View;
 use Yalms\Component\Course\CourseComponent;
@@ -38,10 +37,6 @@ class CourseController extends \BaseController
             return Redirect::action('CourseController@create')
                 ->with('message', $message)
                 ->with('status',$status);
-
-
-
-
     }
 
     public function show($id)

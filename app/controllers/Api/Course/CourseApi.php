@@ -4,9 +4,7 @@ namespace app\controllers\Api\Course;
 
 use BaseController;
 use Response;
-use Illuminate\Support\Facades\Input;
 use Yalms\Component\Course\CourseComponent;
-use Yalms\Models\Courses\Course;
 
 
 /**API-интерфейс на Course**/
@@ -76,18 +74,18 @@ class CourseController extends BaseController
     }
 
 
-    /**
-     * Удаление объекта.
-     * Пример запроса
-     * $.ajax({
-     * url: "/api/v1/course/7",
-     * method :"DELETE"
-     * });
-     * @param $id
-     * @return Response::json
-     */
     public function destroy($id)
     {
+        /**
+         * Удаление объекта.
+         * Пример запроса
+         * $.ajax({
+         * url: "/api/v1/course/7",
+         * method :"DELETE"
+         * });
+         * @param $id
+         * @return Response::json
+         */
         $result = CourseComponent::deleteCourse($id);
         return Response::json($result);
     }

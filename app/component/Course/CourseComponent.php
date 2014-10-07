@@ -49,6 +49,8 @@ class CourseComponent
 
     static public function indexCourses()
     {
+        /**Листинг курсов*/
+
         $params = CourseComponent::setParamPages();
         $courses = Course::paginate($params['perPage'], array('id', 'name'));
         return $courses;
@@ -56,7 +58,7 @@ class CourseComponent
 
     static public function storeCourse()
     {
-        //Запись и сохранение курса
+        /**Запись и сохранение курса*/
 
         //Проверка радостей от пользователя
         $validator = Validator::make(
