@@ -46,7 +46,10 @@ class CourseTest extends TestCase
         //Адекватный ответ
         $expectedResponse = "Course " . CourseTest::firstCourseName . " been successful created";
         $this->assertResponseOk();
-        $this->assertEquals(json_decode($this->client->getResponse()->getContent()), $expectedResponse);
+        $serverResponse = json_decode($this->client->getResponse()->getContent());
+        $messageResponse = $serverResponse->message;
+
+        $this->assertEquals($messageResponse, $expectedResponse);
 
         $this->assertEquals(1, $course->id);
         $this->assertEquals(CourseTest::firstCourseName, $course->name);
@@ -66,7 +69,11 @@ class CourseTest extends TestCase
 
         $expectedResponse = "Course " . CourseTest::secondCourseName . " been successful updated";
         $this->assertResponseOk();
-        $this->assertEquals(json_decode($this->client->getResponse()->getContent()), $expectedResponse);
+
+        $serverResponse = json_decode($this->client->getResponse()->getContent());
+        $messageResponse = $serverResponse->message;
+
+        $this->assertEquals($messageResponse, $expectedResponse);
 
         //Сменилось ли имя
         $course = Course::first();
@@ -107,10 +114,12 @@ class CourseTest extends TestCase
         $this->call('DELETE', $url);
 
         $expectedResponse = "Course " . CourseTest::firstCourseName . " been successful deleted";
-        $response = json_decode($this->client->getResponse()->getContent());
+        $serverResponse = json_decode($this->client->getResponse()->getContent());
+        $messageResponse = $serverResponse->message;
+
 
         //Сверка
-        $this->assertEquals($expectedResponse, $response);
+        $this->assertEquals($expectedResponse, $messageResponse);
         //Проверка на существование
         $this->assertEquals(Course::first(), null);
 
