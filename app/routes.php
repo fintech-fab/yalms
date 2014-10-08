@@ -14,12 +14,14 @@
 Route::get('/', function () {
 	return View::make('hello');
 });
+Route::get('/registration', function() { return View::make('registration'); });
 
+Route::post('/login', 'UserController@login');
+Route::post('/registration', 'UserController@registration');
 
 Route::resource('student', 'StudentController');
 Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
-Route::resource('auth', 'AuthController');
 
 Route::group(array('prefix' => 'api/v1'), function () {
 	Route::resource('user', 'app\controllers\Api\User\UserController');
