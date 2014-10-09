@@ -14,10 +14,10 @@
 Route::get('/', function () {
 	return View::make('hello');
 });
-Route::get('/registration', function() { return View::make('registration'); });
+Route::get('/registration', 'UserSignController@register');
 
-Route::post('/login', 'UserController@login');
-Route::post('/registration', 'UserController@registration');
+Route::post('/login', 'UserSignController@login');
+Route::post('/registration', 'UserSignController@registration');
 
 Route::resource('student', 'StudentController');
 Route::resource('teacher', 'TeacherController');

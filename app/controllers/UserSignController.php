@@ -2,12 +2,18 @@
 
 use Yalms\Models\Users\User;
 
-class UserController extends \BaseController
+class UserSignController extends \BaseController
 {
     public function index()
     {
         return View::make('pages.user.index' );
     }
+
+    public function register()
+    {
+        return View::make('registration');
+    }
+
 
     public function  login()
     {

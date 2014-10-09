@@ -53,17 +53,17 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
 	public function student()
 	{
-		return $this->hasOne('UserStudent');
+		return $this->hasOne(UserStudent::class);
 	}
 
 	public function teacher()
 	{
-		return $this->hasOne('UserTeacher');
+		return $this->hasOne(UserTeacher::class);
 	}
 
 	public function admin()
 	{
-		return $this->hasOne('UserAdmin');
+		return $this->hasOne(UserAdmin::class);
 	}
 
     public static function login( $data )
