@@ -1,5 +1,7 @@
 <?php
-
+use OAuth\OAuth2\Service\Facebook;
+use OAuth\Common\Storage\Session;
+use OAuth\Common\Consumer\Credentials;
 use Yalms\Models\Users\User;
 
 class UserSignController extends \BaseController
@@ -44,14 +46,27 @@ class UserSignController extends \BaseController
             'repeat_password' => 'required|min:8'
         ];
 
-        $val = Validator::make($data, $rules);
 
-        if( $val->fails())
+	    $val = Validator::make($data, $rules);
+	    if ($val->fails())
         {
-            return View::make('errors.validation')->with('errors', $val->messages()->toArray());
+	        return Redirect::to('registration')->withInput()->withErrors($val);
         }
 
         $user = User::register($data);
+
+	    return Redirect::action('UserSignController@index');
     }
+
+	public function loginFacebook()
+	{
+		$code = Input::get('code');
+
+		$fb = OAuth::consumer('Facebook');
+
+		if (!empty($code)) {
+
+		}
+	}
 
 } 
