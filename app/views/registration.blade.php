@@ -1,13 +1,6 @@
 
 
    <h2>Registration</h2>
-   {{
-   	        Debugbar::info($errors);
-   	        Debugbar::info(Input::old("phone"));
-   	        Debugbar::info(Input::old("password"));
-
-
-   }}
 	    {{ Form::open() }}
 	        {{ Form::label('Phone', 'Phone') }}
             {{ Form::text("phone", null, [ "placeholder" => "phone" ], Input::old("phone")) }} <br />
@@ -22,4 +15,6 @@
             {{$errors->first('repeat_password')}}<br />
 
             {{ Form::submit("Sign up") }}
+             or <a href="\loginFacebook">Facebook</a>
+
 	    {{ Form::close()  }}

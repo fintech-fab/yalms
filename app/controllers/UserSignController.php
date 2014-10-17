@@ -1,8 +1,10 @@
 <?php
+
+use Yalms\Models\Users\User;
 use OAuth\OAuth2\Service\Facebook;
 use OAuth\Common\Storage\Session;
 use OAuth\Common\Consumer\Credentials;
-use Yalms\Models\Users\User;
+
 
 class UserSignController extends \BaseController
 {
@@ -60,13 +62,55 @@ class UserSignController extends \BaseController
 
 	public function loginFacebook()
 	{
-		$code = Input::get('code');
+		/**
+		 * Bootstrap the example
+		 *
+		 *require_once __DIR__ . '/bootstrap.php';
+		 */
+// Session storage
+		Debugbar::info(Input::old("phone"));
+		Debugbar::info(Input::old("password"));
+		$storage = new Session();
 
-		$fb = OAuth::consumer('Facebook');
+		$servicesCredentials['facebook']['key'] = '';
+		$servicesCredentials['facebook']['secret'] = '';
+// Setup the credentials for the requests
 
-		if (!empty($code)) {
+		$uriFactory = new \OAuth\Common\Http\Uri\UriFactory();
+		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
+		$currentUri->setQuery('');
 
+		$credentials = new Credentials(
+			$servicesCredentials['facebook']['key'],
+			$servicesCredentials['facebook']['secret'],
+			$currentUri->getAbsoluteUri()
+		);
+
+// Instantiate the Facebook service using the credentials, http client and storage mechanism for the token
+		/** @var $facebookService Facebook */
+		$serviceFactory = new \OAuth\ServiceFactory();
+		$facebookService = $serviceFactory->createService('facebook', $credentials, $storage, array());
+
+
+		if (!empty($_GET['code'])) {
+			// This was a callback request from facebook, get the token
+			$token = $facebookService->requestAccessToken($_GET['code']);
+
+			// Send a request with it
+			$result = json_decode($facebookService->request('/me'), true);
+
+			// Show some of the resultant data
+			echo 'Your unique facebook user id is: ' . $result['id'] . ' and your name is ' . $result['name'];
+
+		} elseif (!empty($_GET['go']) && $_GET['go'] === 'go') {
+			$url = $facebookService->getAuthorizationUri();
+			header('Location: ' . $url);
+		} else {
+			$url = $currentUri->getRelativeUri() . '?go=go';
+			echo "<a href='$url'>Login with Facebook!</a>";
 		}
+
+
 	}
 
 } 

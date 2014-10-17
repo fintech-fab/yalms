@@ -15,6 +15,8 @@ Route::get('/', function () {
 	return View::make('hello');
 });
 Route::get('/registration', 'UserSignController@register');
+/*Route::get('/loginFacebook', 'Facebook');*/
+Route::get('/loginFacebook', 'UserSignController@loginFacebook');
 
 Route::post('/login', 'UserSignController@login');
 Route::post('/registration', 'UserSignController@registration');
