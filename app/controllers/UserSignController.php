@@ -8,6 +8,7 @@ use OAuth\Common\Consumer\Credentials;
 
 class UserSignController extends \BaseController
 {
+
     public function index()
     {
         return View::make('pages.user.index' );
@@ -67,17 +68,16 @@ class UserSignController extends \BaseController
 		 *
 		 *require_once __DIR__ . '/bootstrap.php';
 		 */
-// Session storage
-		Debugbar::info(Input::old("phone"));
-		Debugbar::info(Input::old("password"));
 		$storage = new Session();
-
-		$servicesCredentials['facebook']['key'] = '';
-		$servicesCredentials['facebook']['secret'] = '';
+// Session storage
+		$servicesCredentials['facebook']['key'] = '641605372625410';
+		$servicesCredentials['facebook']['secret'] = 'ddcc4fda61288b868a6ab30eae14400c';
 // Setup the credentials for the requests
 
 		$uriFactory = new \OAuth\Common\Http\Uri\UriFactory();
 		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
+
+		$currentUri->setHost($_SERVER['HTTP_HOST']);
 		$currentUri->setQuery('');
 
 		$credentials = new Credentials(
@@ -102,6 +102,7 @@ class UserSignController extends \BaseController
 			// Show some of the resultant data
 			echo 'Your unique facebook user id is: ' . $result['id'] . ' and your name is ' . $result['name'];
 
+			$user = User::register($result);
 		} elseif (!empty($_GET['go']) && $_GET['go'] === 'go') {
 			$url = $facebookService->getAuthorizationUri();
 			header('Location: ' . $url);
@@ -109,8 +110,6 @@ class UserSignController extends \BaseController
 			$url = $currentUri->getRelativeUri() . '?go=go';
 			echo "<a href='$url'>Login with Facebook!</a>";
 		}
-
-
 	}
 
 } 
