@@ -5,8 +5,12 @@ use Illuminate\Support\Facades\View;
 use Yalms\Component\Course\CourseComponent;
 use Yalms\Models\Courses\Course;
 
+
 class CourseController extends \BaseController
 {
+
+
+
 
     public function index()
     {
@@ -22,8 +26,12 @@ class CourseController extends \BaseController
 
     public function store()
     {
-        $courseComponent = new CourseComponent;
+        $messageBag = new Illuminate\Support\MessageBag;
+
+        $courseComponent = new CourseComponent($messageBag);
+
         $courseSuccessCreated = $courseComponent->storeCourse();
+
         if($courseSuccessCreated){
             //Отсылка к странице новосозданомого курсу
             return Redirect::action('CourseController@show');
