@@ -1,7 +1,5 @@
 <?php
 
-
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\View;
 use Yalms\Component\Course\CourseComponent;
@@ -12,7 +10,7 @@ class CourseController extends \BaseController
 
     public function index()
     {
-        $courses = CourseComponent::indexCourses();
+        $courses = CourseComponent::listCourses();
         return View::make('pages.course.index', compact('courses'));
     }
 
@@ -24,24 +22,15 @@ class CourseController extends \BaseController
 
     public function store()
     {
-        $result = CourseComponent::storeCourse();
-        $message = $result['message'];
-        $status = $result['status'];
-        $id =  $result['id'];
-        if ($id != null)//Курс создан
+        $courseComponent = new CourseComponent;
+        $courseSuccessCreated = $courseComponent->storeCourse();
+        if($courseSuccessCreated){
             //Отсылка к странице новосозданомого курсу
-            return Redirect::action('CourseController@show', array($id))
-                ->with('message', $message)
-                ->with('status',$status);
+            return Redirect::action('CourseController@show');
+        }
         else
             //Вертаем на страницу создания с соответствующим оповещением
-            return Redirect::action('CourseController@create')
-                ->with('message', $message)
-                ->with('status',$status);
-
-
-
-
+            return Redirect::action('CourseController@create')->withErrors();
     }
 
     public function show($id)
