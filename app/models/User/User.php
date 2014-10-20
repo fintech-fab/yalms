@@ -67,4 +67,17 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 		return $this->hasOne(UserAdmin::class);
 	}
 
+    public static function login( $data )
+    {
+        /*
+         * логиним юзера*/
+    }
+
+    public static function register( $data )
+    {
+        /*
+         * Запись юзера в базу*/
+    }
+
+
 }
