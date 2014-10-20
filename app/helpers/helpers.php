@@ -1,6 +1,5 @@
 <?php
 use Illuminate\Support\Facades\Session;
-use Yalms\Component\Shared\FlashMessageBag;
 
 /**
  * Created by PhpStorm.
@@ -12,8 +11,6 @@ use Yalms\Component\Shared\FlashMessageBag;
  */
 function statusMessage()
 {
-    $messageBag = new FlashMessageBag($_SESSION);
-    dd($messageBag);
     if (Session::has('status') && Session::has('message'))
 
         //Есть статусное сообщение

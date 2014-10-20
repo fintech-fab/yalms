@@ -6,5 +6,6 @@
         <title>@yield('title')</title>
     </head>
     <body>
+
     {{--status helper from app/helpers/helpers.php--}}
     {{statusMessage()}}

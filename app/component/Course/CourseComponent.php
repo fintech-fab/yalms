@@ -13,28 +13,15 @@ namespace Yalms\Component\Course;
 use Doctrine\DBAL\Types\BooleanType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yalms\Models\Courses\Course;
-//Глобальный контейнер сообщений.Будет использоваться альтернативой упаковки в сессию статусных переменных
-//Идея взята с http://toddish.co.uk/blog/global-site-messages-in-laravel-4/
-use Illuminate\Support\Contracts\MessageProviderInterface;
 
 class CourseComponent
 
 {
 
-    public $messages;
-
-
-    /**
-     * __construct
-     *
-     * @param MessageProviderInterface $messages
-     */
-    public function __construct(MessageProviderInterface $messages)
-    {
-        $this->messages = $messages;
-    }
+    public $errors;
 
     static public function setParamPages()
     {
@@ -85,8 +72,6 @@ class CourseComponent
             array('name' => array('required', 'min:5'))
         );
 
-        //Подготовка контейнера сообщений
-        $messageBag = $this->messages;
 
         if ($validator->passes()) {
 
@@ -98,22 +83,26 @@ class CourseComponent
 
             //т.к у нас тепреь есть новая модель(потенциально есть),
             //но контроллеры о ней ничего еще не знают-
-            //положим упоминание о ней в Message Bag,чтоб они смогли прочитать
-            $messageBag->add('courseId', $course->id);
+            //положим упоминание о ней,чтоб они смогли прочитать и впоследствии использовать эту инфу
+            Session::flash('courseId', $course->id);
 
             $message = 'Course ' . $course->name . ' been successful created';
             $status = 'success';
             $result = true;
+
         } else {
+
             //Все немного хуже и данные не валидны
             $message = 'Course not been successful created';
             $status = 'fail';
             $result = false;
+            //Отдадим ошибки обратно клиенту
+            $this->errors = $validator->messages();
+
         }
 
-        //Вложим в контейнер сообщений итог действия
-        $messageBag->add('message', $message);
-        $messageBag->add('status', $status);
+        Session::flash('message', $message);
+        Session::flash('status', $status);
 
 
         return $result;

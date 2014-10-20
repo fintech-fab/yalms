@@ -20,11 +20,6 @@ ClassLoader::addDirectories(array(
 
 ));
 
-App::bind(
-	'Illuminate\Support\Contracts\MessageProviderInterface',
-	'Illuminate\Support\MessageBag'
-);
-
 /*
 |--------------------------------------------------------------------------
 | Application Error Logger

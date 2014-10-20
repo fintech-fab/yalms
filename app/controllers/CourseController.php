@@ -1,6 +1,8 @@
 <?php
 
+
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Yalms\Component\Course\CourseComponent;
 use Yalms\Models\Courses\Course;
@@ -26,19 +28,20 @@ class CourseController extends \BaseController
 
     public function store()
     {
-        $messageBag = new Illuminate\Support\MessageBag;
 
-        $courseComponent = new CourseComponent($messageBag);
+        $courseComponent = new CourseComponent;
 
         $courseSuccessCreated = $courseComponent->storeCourse();
 
         if($courseSuccessCreated){
             //Отсылка к странице новосозданомого курсу
-            return Redirect::action('CourseController@show');
+            $id = Session::get('id');
+            # FIXME Странная бага,перенаправляет на список всех курсов а не на конретный.
+            return Redirect::action('CourseController@show', array($id));
         }
         else
             //Вертаем на страницу создания с соответствующим оповещением
-            return Redirect::action('CourseController@create')->withErrors();
+            return Redirect::action('CourseController@create')->withErrors($courseComponent->errors);
     }
 
     public function show($id)
