@@ -10,22 +10,17 @@ namespace Yalms\Component\Course;
 
 
 
+use Doctrine\DBAL\Types\BooleanType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\MessageBag;
 use Yalms\Models\Courses\Course;
 
 class CourseComponent
-{
-    /**
-     * Отдает список курсов
-     * Может принимать дополнительные параметры,такие как число курсов на странице.
-     * Параметры запроса страниц (не обязательные):
-     *      per_page — количество на странице.
-     *     *
-     * @return \Illuminate\Pagination\Paginator
-     */
 
+{
     static public function setParamPages()
     {
         /**
@@ -47,10 +42,16 @@ class CourseComponent
         return array('perPage' => $perPage);
     }
 
-    static public function indexCourses()
+    static public function listCourses()
     {
-        /**Листинг курсов*/
-
+        /**
+         * Отдает список курсов
+         * Может принимать дополнительные параметры,такие как число курсов на странице.
+         * Параметры запроса страниц (не обязательные):
+         *      per_page — количество на странице.
+         *     *
+         * @return \Illuminate\Pagination\Paginator
+         */
         $params = CourseComponent::setParamPages();
         $courses = Course::paginate($params['perPage'], array('id', 'name'));
         return $courses;
@@ -58,36 +59,48 @@ class CourseComponent
 
     static public function storeCourse()
     {
-        /**Запись и сохранение курса*/
+        /**Запись и сохранение курса
+         * в случае удачи - возвращаем true,иначе false
+         * @return BooleanType
+         * */
 
         //Проверка радостей от пользователя
         $validator = Validator::make(
-            array('Course name' => Input::get('name')),
-            array('Course name' => array('required', 'min:5'))
+            array('name' => Input::get('name')),
+            array('name' => array('required', 'min:5'))
         );
 
         if ($validator->passes()) {
+            dd($validator);
+
             //Прошла валидация
+
             $course = new Course();
             $course->name = Input::get('name');
             $course->save();
 
+            //т.к у нас тепреь есть новая модель,
+            //но контроллеры о ней ничего еще не знают-
+            //положим упоминание о ней в Message Bag,чтоб они смогли прочитать
+            $messageBag = new MessageBag;
+            $messageBag->add('courseId', $course->id);
+
             $message = 'Course ' . $course->name . ' been successful created';
             $status = 'success';
-            $id = $course->id;
-
+            $result = true;
         } else {
             //Все немного хуже и данные не валидны
-            $message = $validator->messages();
+            $message = 'Course not been successful created';
             $status = 'fail';
-            $id = null;
+            $result = false;
         }
 
-        return array(
-            'message' => $message,
-            'status' => $status,
-            'id'=>$id
-        );
+        //Вложим в сессию итог действия
+
+        Session::put('message',$message);
+        Session::put('status',$status);
+
+        return $result;
 
     }
 

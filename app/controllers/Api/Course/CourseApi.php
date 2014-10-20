@@ -20,7 +20,7 @@ class CourseController extends BaseController
      */
     public function index()
     {
-        $courses = CourseComponent::indexCourses();
+        $courses = CourseComponent::listCourses();
         return Response::json($courses);
     }
 
