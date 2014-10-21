@@ -9,9 +9,7 @@
 namespace Yalms\Component\Course;
 
 
-
 use Doctrine\DBAL\Types\BooleanType;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -57,9 +55,10 @@ class CourseComponent
         $params = CourseComponent::setParamPages();
         $courses = Course::paginate($params['perPage'], array('id', 'name'));
         return $courses;
+
     }
 
-    public  function storeCourse()
+    public function storeCourse()
     {
         /**Запись и сохранение курса
          * в случае удачи - возвращаем true,иначе false
@@ -71,7 +70,6 @@ class CourseComponent
             array('name' => Input::get('name')),
             array('name' => array('required', 'min:5'))
         );
-
 
         if ($validator->passes()) {
 
@@ -91,50 +89,55 @@ class CourseComponent
             $result = true;
 
         } else {
-
             //Все немного хуже и данные не валидны
+            //Отдадим ошибки обратно клиенту
+            $this->errors = $validator->messages();
             $message = 'Course not been successful created';
             $status = 'fail';
             $result = false;
-            //Отдадим ошибки обратно клиенту
-            $this->errors = $validator->messages();
-
         }
 
-        Session::flash('message', $message);
-        Session::flash('status', $status);
-
+        $list = array('message' => $message, 'status' => $status);
+        packValueToSession($list);
 
         return $result;
 
     }
 
-    static public function updateCourse($id)
+    public function updateCourse($id)
     {
         //Обновление
         $course = Course::findOrFail($id);
+        $oldCourseName = $course->name;
+        //Айдишник нам пригодится как в удачном случае,так и в случае провала
+        Session::flash('courseId', $id);
 
         $validator = Validator::make(
-            array('Course name' => Input::get('name')),
-            array('Course name' => array('required', 'min:5'))
+            array('name' => Input::get('name')),
+            array('name' => array('required', 'min:5'))
         );
 
         if ($validator->passes()) {
             $course->name = Input::get('name');
             $course->save();
 
-            $message = 'Course ' . $course->name . ' been successful updated';
+            $message = 'Course ' . $oldCourseName . ' been successful updated';
             $status = 'success';
+            $result = true;
 
         } else {
-            $message = $validator->messages();
+            $this->errors = $validator->messages();
+
+            $message = 'Course ' . $oldCourseName . ' not been successful updated';
             $status = 'fail';
+            $result = false;
         }
 
-        return array(
-            'message' => $message,
-            'status' => $status
-        );
+        $list = array('message' => $message, 'status' => $status);
+        packValueToSession($list);
+
+
+        return $result;
 
     }
 
@@ -145,30 +148,26 @@ class CourseComponent
         return $course;
     }
 
-    static public function deleteCourse($id)
+    public function deleteCourse($id)
     {
-        try {
-            $course = Course::findOrFail($id);
-            $course->delete();
-            if (Course::find($id) == null){
-                //Курса нет более
-                $message = 'Course ' . $course->name . ' been successful deleted';
-                $status = 'success';
-            } else {
-                $message = 'Course ' . $course->name . ' not been  deleted';
-                $status = 'fail';
-            }
-        } catch (ModelNotFoundException $e) {
-            //Мимо.Нет такой страницы
-            $message = 'Course not found';
+        $course = Course::findOrFail($id);
+        $course->delete();
+
+        if (Course::find($id) == null) {
+            //Курса нет более
+            $message = 'Course ' . $course->name . ' been successful deleted';
+            $status = 'success';
+            $result = true;
+        } else {
+            $message = 'Course ' . $course->name . ' not been  deleted';
             $status = 'fail';
+            $result = false;
         }
 
-        return array(
-            'message' => $message,
-            'status' => $status
-        );
+        $list = array('message' => $message, 'status' => $status);
+        packValueToSession($list);
 
+        return $result;
 
     }
-} 
+}
