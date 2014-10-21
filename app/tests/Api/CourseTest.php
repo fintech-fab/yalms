@@ -2,7 +2,6 @@
 
 namespace Yalms\Tests\Api;
 
-
 use TestCase;
 use Yalms\Models\Courses\Course;
 
@@ -12,6 +11,7 @@ class CourseTest extends TestCase
 
     const firstCourseName = 'Астрология';
     const secondCourseName = 'Физика';
+    const thirdCourseName = 'ОБЖ';
 
     public function createCourse($courseName)
     {
@@ -27,102 +27,60 @@ class CourseTest extends TestCase
         parent::setUp();
         Course::truncate();
 
-
-
-
     }
 
     /**
-     * регистрируется новый человек.Функция store()
+     * Создается новый курс.Функция store()
      */
-    public function testCourseCreate()
+
+    public function testCourseSuccessfulCreate()
     {
+        //Expected answer
+        $expectedMessageResponse = "Course " . CourseTest::firstCourseName . " been successful created";
+        $expectedStatusResponse = "success";
+
         $this->call('POST', 'api/v1/course', [
             'name' => CourseTest::firstCourseName,
         ]);
 
+        $serverResponse = json_decode($this->client->getResponse()->getContent());
+        $ServerMessageResponse = $serverResponse->message;
+        $ServerStatusResponse = $serverResponse->status;
+        $courseId = $serverResponse->id;
+        $errors = $serverResponse->errors;
+
         $course = Course::first();
 
-        //Адекватный ответ
-        $expectedResponse = "Course " . CourseTest::firstCourseName . " been successful created";
+        //Tests
         $this->assertResponseOk();
-        $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $messageResponse = $serverResponse->message;
-
-        $this->assertEquals($messageResponse, $expectedResponse);
-
-        $this->assertEquals(1, $course->id);
-        $this->assertEquals(CourseTest::firstCourseName, $course->name);
+        $this->assertNotEquals(null, $courseId);//Курс создан вообще как таковой
+        $this->assertEquals(1, $course->id);//Причем он единственный и первый
+        $this->assertEquals(null, $errors);//При этом не было ошибок
+        $this->assertEquals($ServerMessageResponse, $expectedMessageResponse);//Сообщение ответа сервера совпало с ожидаемым
+        $this->assertEquals($ServerStatusResponse, $expectedStatusResponse);//Статус выполнения операции совпал с ожидаемым
+        $this->assertEquals(CourseTest::firstCourseName, $course->name);//Название курса совпадает с ожидаемым
     }
 
-    public function testCourseUpdate()
+    public function testCourseNotBeenCreate()
     {
+        $expectedMessageResponse = 'Course not been successful created';
+        $expectedStatusResponse = "fail";
+        $expectedMessageErrorsName = 'The name must be at least 5 characters.';
 
-        $course = CourseTest::createCourse(CourseTest::firstCourseName);
-        $url = '/api/v1/course/' . $course->id;
-
-        //Отсылка на ресурс с данным айдишником
-        $this->call('PUT', $url, [
-            'name' => CourseTest::secondCourseName,
+        $this->call('POST', 'api/v1/course', [
+            'name' => CourseTest::thirdCourseName,
         ]);
 
+        $serverResponse = json_decode($this->client->getResponse()->getContent());
+        $serverMessageResponse = $serverResponse->message;
+        $serverStatusResponse = $serverResponse->status;
+        $serverMessageErrors = $serverResponse->errors->name[0];
 
-        $expectedResponse = "Course " . CourseTest::secondCourseName . " been successful updated";
+        //Tests
         $this->assertResponseOk();
-
-        $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $messageResponse = $serverResponse->message;
-
-        $this->assertEquals($messageResponse, $expectedResponse);
-
-        //Сменилось ли имя
-        $course = Course::first();
-        $this->assertEquals(CourseTest::secondCourseName, $course->name);
-
-
-    }
-
-    public function testCourseList()
-    {
-
-        $courseFirst = CourseTest::createCourse(CourseTest::firstCourseName);
-        $courseSecond = CourseTest::createCourse(CourseTest::secondCourseName);
-
-        $url = '/api/v1/course/';
-
-        //Запрос списка
-        $this->call('GET', $url);
-        //Ответ
-        $response = json_decode($this->client->getResponse()->getContent());
-
-        //Сверка
-        $data =$response->data;
-
-        $this->assertEquals($data[0]->name, $courseFirst->name);
-        $this->assertEquals($data[1]->name, $courseSecond->name);
-
-
-    }
-
-    public function testCourseDelete()
-    {
-
-        $course = CourseTest::createCourse(CourseTest::firstCourseName);
-
-        $url = '/api/v1/course/' . $course->id;
-
-        $this->call('DELETE', $url);
-
-        $expectedResponse = "Course " . CourseTest::firstCourseName . " been successful deleted";
-        $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $messageResponse = $serverResponse->message;
-
-
-        //Сверка
-        $this->assertEquals($expectedResponse, $messageResponse);
-        //Проверка на существование
-        $this->assertEquals(Course::first(), null);
-
-
+        $this->assertEquals(null, Course::first());//Курс не создан вообще как таковой
+        $this->assertEquals($serverMessageResponse, $expectedMessageResponse);
+        $this->assertEquals($serverStatusResponse, $expectedStatusResponse);
+        $this->assertEquals($serverMessageErrors, $expectedMessageErrorsName);//Получили ошибки
     }
 }

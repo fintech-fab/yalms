@@ -3,6 +3,7 @@
 namespace app\controllers\Api\Course;
 
 use BaseController;
+use Illuminate\Support\Facades\Session;
 use Response;
 use Yalms\Component\Course\CourseComponent;
 
@@ -35,9 +36,24 @@ class CourseController extends BaseController
      */
     public function store()
     {
-        $result = CourseComponent::storeCourse();
-        //Респонз о результатах действий
-        return Response::json($result);
+        $courseComponent = new CourseComponent;
+        $courseSuccessCreated = $courseComponent->storeCourse();
+        $status = Session::get('status');
+        $message = Session::get('message');
+
+        if ($courseSuccessCreated) {
+            $id = Session::get('courseId');
+            $errors = null;
+        }else{
+            $id = null;
+            $errors = $courseComponent->errors;
+        }
+
+        $keys = array('id', 'status', 'message','errors');
+        $value = array($id, $status,$message,$errors);
+        $response = array_combine($keys,$value);
+
+        return Response::json($response);
     }
 
 
