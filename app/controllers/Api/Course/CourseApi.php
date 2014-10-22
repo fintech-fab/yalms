@@ -85,8 +85,23 @@ class CourseController extends BaseController
      */
     public function update($id)
     {
-        $result = CourseComponent::updateCourse($id);
-        return Response::json($result);
+        $courseComponent = new CourseComponent;
+        $courseSuccessUpdated = $courseComponent->updateCourse($id);
+        $status = Session::get('status');
+        $message = Session::get('message');
+
+        if ($courseSuccessUpdated) {
+            $id = Session::get('courseId');
+            $errors = null;
+        }else{
+            $id = null;
+            $errors = $courseComponent->errors;
+        }
+
+        $keys = array('id', 'status', 'message','errors');
+        $value = array($id, $status,$message,$errors);
+        $response = array_combine($keys,$value);
+        return Response::json($response);
     }
 
 
@@ -102,7 +117,20 @@ class CourseController extends BaseController
          * @param $id
          * @return Response::json
          */
-        $result = CourseComponent::deleteCourse($id);
-        return Response::json($result);
+        $courseComponent = new CourseComponent;
+        $courseSuccessDeleted = $courseComponent->deleteCourse($id);
+        $status = Session::get('status');
+        $message = Session::get('message');
+
+        if ($courseSuccessDeleted) {
+            $errors = null;
+        }else{
+            $errors = $courseComponent->errors;
+        }
+
+        $keys = array('status', 'message','errors');
+        $value = array($status,$message,$errors);
+        $response = array_combine($keys,$value);
+        return Response::json($response);
     }
 }

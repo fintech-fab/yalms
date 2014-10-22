@@ -128,7 +128,7 @@ class CourseComponent
         } else {
             $this->errors = $validator->messages();
 
-            $message = 'Course ' . $oldCourseName . ' not been successful updated';
+            $message = 'Course not been successful updated';
             $status = 'fail';
             $result = false;
         }
@@ -159,7 +159,7 @@ class CourseComponent
             $status = 'success';
             $result = true;
         } else {
-            $message = 'Course ' . $course->name . ' not been  deleted';
+            $message = 'Course not been deleted';
             $status = 'fail';
             $result = false;
         }
