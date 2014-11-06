@@ -3,7 +3,6 @@
 namespace app\controllers\Api\Course;
 
 use BaseController;
-use Illuminate\Support\Facades\Session;
 use Response;
 use Yalms\Component\Course\CourseComponent;
 
@@ -26,39 +25,7 @@ class CourseController extends BaseController
     }
 
     /**
-     * Обновление объекта.
-     * Пример запроса
-     * $.ajax({
-     * url: "/api/v1/course",
-     * method :"POST",
-     * data: {"name": "foo"}
-     * });
-     */
-    public function store()
-    {
-        $courseComponent = new CourseComponent;
-        $courseSuccessCreated = $courseComponent->storeCourse();
-        $status = Session::get('status');
-        $message = Session::get('message');
-
-        if ($courseSuccessCreated) {
-            $id = Session::get('courseId');
-            $errors = null;
-        }else{
-            $id = null;
-            $errors = $courseComponent->errors;
-        }
-
-        $keys = array('id', 'status', 'message','errors');
-        $value = array($id, $status,$message,$errors);
-        $response = array_combine($keys,$value);
-
-        return Response::json($response);
-    }
-
-
-    /**
-     * Получение конкретного объекта.
+     * Получение объекта.
      * Пример запроса
      * $.ajax({
      * url: "/api/v1/course/1"
@@ -76,6 +43,35 @@ class CourseController extends BaseController
      * Обновление объекта.
      * Пример запроса
      * $.ajax({
+     * url: "/api/v1/course",
+     * method :"POST",
+     * data: {"name": "foo"}
+     * });
+     */
+    public function store()
+    {
+        $courseComponent = new CourseComponent;
+        $courseSuccessCreated = $courseComponent->storeCourse();
+
+        if ($courseSuccessCreated) {
+            $id = $courseComponent->courseId;
+            $errors = $courseComponent->errors;
+        } else {
+            $id = null;
+            $errors = $courseComponent->errors;
+        }
+
+        $keys = array('id', 'errors');
+        $value = array($id, $errors);
+        $response = array_combine($keys, $value);
+
+        return Response::json($response);
+    }
+
+    /**
+     * Обновление объекта.
+     * Пример запроса
+     * $.ajax({
      * url: "/api/v1/course/7",
      * method :"PUT",
      * data: {"name": "bar"}
@@ -87,50 +83,42 @@ class CourseController extends BaseController
     {
         $courseComponent = new CourseComponent;
         $courseSuccessUpdated = $courseComponent->updateCourse($id);
-        $status = Session::get('status');
-        $message = Session::get('message');
 
         if ($courseSuccessUpdated) {
-            $id = Session::get('courseId');
-            $errors = null;
-        }else{
+            $id = $courseComponent->courseId;
+            $errors = $courseComponent->errors;
+        } else {
             $id = null;
             $errors = $courseComponent->errors;
         }
 
-        $keys = array('id', 'status', 'message','errors');
-        $value = array($id, $status,$message,$errors);
-        $response = array_combine($keys,$value);
+        $keys = array('id', 'errors');
+        $value = array($id, $errors);
+        $response = array_combine($keys, $value);
         return Response::json($response);
     }
 
-
+    /**
+     * Удаление объекта.
+     * Пример запроса
+     * $.ajax({
+     * url: "/api/v1/course/7",
+     * method :"DELETE"
+     * });
+     * @param $id
+     * @return Response::json
+     */
     public function destroy($id)
     {
-        /**
-         * Удаление объекта.
-         * Пример запроса
-         * $.ajax({
-         * url: "/api/v1/course/7",
-         * method :"DELETE"
-         * });
-         * @param $id
-         * @return Response::json
-         */
         $courseComponent = new CourseComponent;
-        $courseSuccessDeleted = $courseComponent->deleteCourse($id);
-        $status = Session::get('status');
-        $message = Session::get('message');
+        $courseComponent->deleteCourse($id);
 
-        if ($courseSuccessDeleted) {
-            $errors = null;
-        }else{
-            $errors = $courseComponent->errors;
-        }
+        $id = $courseComponent->courseId;
+        $errors = $courseComponent->errors;
 
-        $keys = array('status', 'message','errors');
-        $value = array($status,$message,$errors);
-        $response = array_combine($keys,$value);
+        $keys = array('id', 'errors');
+        $value = array($id, $errors);
+        $response = array_combine($keys, $value);
         return Response::json($response);
     }
 }

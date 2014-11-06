@@ -51,39 +51,61 @@ class CourseTest extends TestCase
 
     }
 
+    public function testCourseShow()
+    {
+        //Получить данные по курсу
+
+        $course = CourseTest::createCourse(CourseTest::firstCourseName);
+        $url = '/api/v1/course/' . $course->id;
+
+        //Expected answer
+        $expectedCourseId = 1;
+        $expectedCourseName =CourseTest::firstCourseName;
+
+        //Отсылка на ресурс с данным айдишником
+        $this->call('GET', $url);
+
+
+
+        $serverResponse = json_decode($this->client->getResponse()->getContent());
+        $serverCourseId = $serverResponse->id;
+        $serverCourseName = $serverResponse -> name;
+
+
+        //Tests
+        $this->assertResponseOk();
+        $this->assertEquals($expectedCourseName, $serverCourseName);//Сменилось ли имя
+        $this->assertEquals($expectedCourseId, $serverCourseId);
+    }
 
     public function testCourseSuccessfulCreate()
     {
-        //Expected answer
-        $expectedMessageResponse = "Course " . CourseTest::firstCourseName . " been successful created";
-        $expectedStatusResponse = "success";
+
 
         $this->call('POST', 'api/v1/course', [
             'name' => CourseTest::firstCourseName,
         ]);
 
+        //Expected answer
+        $expectedCourseId = 1;
+        $expectedErrors = null;
+
+
         $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $serverMessageResponse = $serverResponse->message;
-        $serverStatusResponse = $serverResponse->status;
-        $courseId = $serverResponse->id;
+        $serverCourseId = $serverResponse->id;
         $errors = $serverResponse->errors;
 
-        $course = Course::first();
 
         //Tests
         $this->assertResponseOk();
-        $this->assertNotEquals(null, $courseId);//Курс создан вообще как таковой
-        $this->assertEquals(1, $course->id);//Причем он единственный и первый
+        $this->assertNotEquals(null, $serverCourseId);//Курс создан вообще как таковой
+        $this->assertEquals($expectedCourseId, $serverCourseId);//Причем он единственный и первый
         $this->assertEquals(null, $errors);//При этом не было ошибок
-        $this->assertEquals($serverMessageResponse, $expectedMessageResponse);//Сообщение ответа сервера совпало с ожидаемым
-        $this->assertEquals($serverStatusResponse, $expectedStatusResponse);//Статус выполнения операции совпал с ожидаемым
-        $this->assertEquals(CourseTest::firstCourseName, $course->name);//Название курса совпадает с ожидаемым
     }
 
     public function testCourseNotBeenCreate()
     {
-        $expectedMessageResponse = 'Course not been successful created';
-        $expectedStatusResponse = "fail";
+
         $expectedMessageErrorsName = 'The name must be at least 5 characters.';
 
         $this->call('POST', 'api/v1/course', [
@@ -91,52 +113,50 @@ class CourseTest extends TestCase
         ]);
 
         $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $serverMessageResponse = $serverResponse->message;
-        $serverStatusResponse = $serverResponse->status;
         $serverMessageErrors = $serverResponse->errors->name[0];
+        $serverInstanceId = $serverResponse->id;
 
         //Tests
         $this->assertResponseOk();
         $this->assertEquals(null, Course::first());//Курс не создан вообще как таковой
-        $this->assertEquals($serverMessageResponse, $expectedMessageResponse);
-        $this->assertEquals($serverStatusResponse, $expectedStatusResponse);
+        $this->assertEquals(null, $serverInstanceId);//Сервер ответил что айдишник создаваемго инстанса - неизвестен
         $this->assertEquals($serverMessageErrors, $expectedMessageErrorsName);//Получили ошибки
     }
 
     public function testCourseSuccessfulUpdate()
     {
-        //Expected answer
-        $expectedMessageResponse = "Course " . CourseTest::firstCourseName . " been successful updated";
-        $expectedStatusResponse = "success";
+
 
         $course = CourseTest::createCourse(CourseTest::firstCourseName);
         $url = '/api/v1/course/' . $course->id;
 
+        //Expected answer
+        $expectedCourseId = 1;
+        $expectedErrors = null;
+        $expectedCourseName =CourseTest::secondCourseName;
+
         //Отсылка на ресурс с данным айдишником
         $this->call('PUT', $url, [
-            'name' => CourseTest::secondCourseName,
+            'name' => $expectedCourseName,
         ]);
 
 
+
         $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $ServerMessageResponse = $serverResponse->message;
-        $ServerStatusResponse = $serverResponse->status;
-        $errors = $serverResponse->errors;
+        $serverCourseId = $serverResponse->id;
+        $serverErrors = $serverResponse -> errors;
         $course = Course::first();
 
         //Tests
         $this->assertResponseOk();
-        $this->assertEquals(CourseTest::secondCourseName, $course->name);//Сменилось ли имя
-        $this->assertEquals(null, $errors);//При этом не было ошибок
-        $this->assertEquals($ServerMessageResponse, $expectedMessageResponse);
-        $this->assertEquals($ServerStatusResponse, $expectedStatusResponse);
+        $this->assertEquals($expectedCourseName, $course->name);//Сменилось ли имя
+        $this->assertEquals($expectedCourseId, $serverCourseId);
+        $this->assertEquals($expectedErrors, $serverErrors);//При этом не было ошибок
 
     }
 
     public function testCourseNotBeenUpdate()
     {
-        $expectedMessageResponse = "Course not been successful updated";
-        $expectedStatusResponse = "fail";
         $expectedMessageErrorsName = 'The name must be at least 5 characters.';
 
         $course = CourseTest::createCourse(CourseTest::firstCourseName);
@@ -149,23 +169,19 @@ class CourseTest extends TestCase
 
 
         $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $serverMessageResponse = $serverResponse->message;
-        $serverStatusResponse = $serverResponse->status;
         $serverMessageErrors = $serverResponse->errors->name[0];
         $course = Course::first();
 
         //Tests
         $this->assertResponseOk();
         $this->assertNotEquals(CourseTest::thirdCourseName, $course->name);//Имя курса не было обновлено
-        $this->assertEquals($serverMessageResponse, $expectedMessageResponse);
-        $this->assertEquals($serverStatusResponse, $expectedStatusResponse);
         $this->assertEquals($serverMessageErrors, $expectedMessageErrorsName);//Получили ошибки
 
     }
 
     public function testCourseSuccessfulDelete()
     {
-        $expectedMessageResponse = "Course " . CourseTest::firstCourseName . " been successful deleted";
+        $expectedMessageResponse = "Course been deleted";
         $expectedStatusResponse = "success";
 
         $course = CourseTest::createCourse(CourseTest::firstCourseName);
@@ -176,17 +192,15 @@ class CourseTest extends TestCase
 
 
         $serverResponse = json_decode($this->client->getResponse()->getContent());
-        $ServerMessageResponse = $serverResponse->message;
-        $ServerStatusResponse = $serverResponse->status;
         $errors = $serverResponse->errors;
+        $courseId = $serverResponse->id;
         $course = Course::first();
 
         //Tests
         $this->assertResponseOk();
-        $this->assertEquals(null, $course);//Курса больше не существует
+        $this->assertEquals(null, $course);//Курса больше не существует в базе
+        $this->assertEquals(null, $courseId);//Сервер ответил что курса более нет
         $this->assertEquals(null, $errors);//Удаление прошло без ошибок
-        $this->assertEquals($ServerMessageResponse, $expectedMessageResponse);
-        $this->assertEquals($ServerStatusResponse, $expectedStatusResponse);
     }
     #TODO Добавить тесты на неудачное удаление.Для этого предусмотреть в компоненте исключения(например попыка удаления несуществующего курса)
 

@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
+use Redirect;
+use View;
 use Yalms\Component\Course\CourseComponent;
 use Yalms\Models\Courses\Course;
 
@@ -45,11 +44,13 @@ class CourseController extends \BaseController
 
         if ($courseSuccessCreated) {
             //Отсылка к странице новосозданомого курсу
-            $id = Session::get('courseId');
+            $id = $courseComponent->courseId;
             return Redirect::action('CourseController@show', array($id));
-        } else
+        } else {
             //Вертаем на страницу создания с соответствующим оповещением
-            return Redirect::action('CourseController@create')->withErrors($courseComponent->errors);
+            return Redirect::action('CourseController@create')
+                ->withErrors($courseComponent->errors);
+        }
     }
 
 
@@ -57,14 +58,13 @@ class CourseController extends \BaseController
     {
         $courseComponent = new CourseComponent;
         $courseSuccessUpdated = $courseComponent->updateCourse($id);
-        $id = Session::get('courseId');
-
         if ($courseSuccessUpdated) {
             //Отсылка к странице измененому курсу,увидим что мы там обновили
             return Redirect::action('CourseController@show', array($id));
         } else
             //Просмотр объекта с соответствующим оповещением
-            return Redirect::action('CourseController@edit', array($id))->withErrors($courseComponent->errors);
+            return Redirect::action('CourseController@edit', array($id))
+                ->withErrors($courseComponent->errors);
     }
 
     public function destroy($id)
@@ -77,6 +77,7 @@ class CourseController extends \BaseController
             return Redirect::action('CourseController@index');
         } else
             //Просмотр объекта с соответствующим оповещением
-            return Redirect::action('CourseController@index')->withErrors($courseComponent->errors);
+            return Redirect::action('CourseController@index')
+                ->withErrors($courseComponent->errors);
     }
 }
