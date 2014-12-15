@@ -16,6 +16,8 @@ use Eloquent;
  * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Users\UserAdmin whereEnabled($value)
  * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Users\UserAdmin whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Users\UserAdmin whereUpdatedAt($value)
+ * @method static UserAdmin findOrFail($id)
+ *
  */
 class UserAdmin extends Eloquent
 {
