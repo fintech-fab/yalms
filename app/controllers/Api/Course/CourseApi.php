@@ -4,9 +4,7 @@ namespace app\controllers\Api\Course;
 
 use BaseController;
 use Response;
-use Illuminate\Support\Facades\Input;
 use Yalms\Component\Course\CourseComponent;
-use Yalms\Models\Courses\Course;
 
 
 /**API-интерфейс на Course**/
@@ -27,24 +25,7 @@ class CourseController extends BaseController
     }
 
     /**
-     * Обновление объекта.
-     * Пример запроса
-     * $.ajax({
-     * url: "/api/v1/course",
-     * method :"POST",
-     * data: {"name": "foo"}
-     * });
-     */
-    public function store()
-    {
-        $result = CourseComponent::storeCourse();
-        //Респонз о результатах действий
-        return Response::json($result);
-    }
-
-
-    /**
-     * Получение конкретного объекта.
+     * Получение объекта.
      * Пример запроса
      * $.ajax({
      * url: "/api/v1/course/1"
@@ -62,6 +43,35 @@ class CourseController extends BaseController
      * Обновление объекта.
      * Пример запроса
      * $.ajax({
+     * url: "/api/v1/course",
+     * method :"POST",
+     * data: {"name": "foo"}
+     * });
+     */
+    public function store()
+    {
+        $courseComponent = new CourseComponent;
+        $courseSuccessCreated = $courseComponent->storeCourse();
+
+        if ($courseSuccessCreated) {
+            $id = $courseComponent->courseId;
+            $errors = $courseComponent->errors;
+        } else {
+            $id = null;
+            $errors = $courseComponent->errors;
+        }
+
+        $keys = array('id', 'errors');
+        $value = array($id, $errors);
+        $response = array_combine($keys, $value);
+
+        return Response::json($response);
+    }
+
+    /**
+     * Обновление объекта.
+     * Пример запроса
+     * $.ajax({
      * url: "/api/v1/course/7",
      * method :"PUT",
      * data: {"name": "bar"}
@@ -71,10 +81,22 @@ class CourseController extends BaseController
      */
     public function update($id)
     {
-        $result = CourseComponent::updateCourse($id);
-        return Response::json($result);
-    }
+        $courseComponent = new CourseComponent;
+        $courseSuccessUpdated = $courseComponent->updateCourse($id);
 
+        if ($courseSuccessUpdated) {
+            $id = $courseComponent->courseId;
+            $errors = $courseComponent->errors;
+        } else {
+            $id = null;
+            $errors = $courseComponent->errors;
+        }
+
+        $keys = array('id', 'errors');
+        $value = array($id, $errors);
+        $response = array_combine($keys, $value);
+        return Response::json($response);
+    }
 
     /**
      * Удаление объекта.
@@ -88,7 +110,15 @@ class CourseController extends BaseController
      */
     public function destroy($id)
     {
-        $result = CourseComponent::deleteCourse($id);
-        return Response::json($result);
+        $courseComponent = new CourseComponent;
+        $courseComponent->deleteCourse($id);
+
+        $id = $courseComponent->courseId;
+        $errors = $courseComponent->errors;
+
+        $keys = array('id', 'errors');
+        $value = array($id, $errors);
+        $response = array_combine($keys, $value);
+        return Response::json($response);
     }
 }

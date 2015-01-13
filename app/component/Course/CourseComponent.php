@@ -8,30 +8,25 @@
 
 namespace Yalms\Component\Course;
 
-
-
-use Doctrine\DBAL\Types\BooleanType;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\MessageBag;
+use Input;
+use Validator;
 use Yalms\Models\Courses\Course;
 
 class CourseComponent
 
 {
-    static public function setParamPages()
+
+    public $errors;
+    public $courseName;
+    public $courseId;
+
+    static public function getParamPages()
     {
         /**
          *Распарсиваем то что нам пришло и в зависимости от этого -
          *модифицируем отдаваему страницу и количество объектов в ней
-         * */
-        $perPage = 5; //Количество курсов на странице по умолчанию
-        if (Input::has('per_page')) {
-            //Если таки пользователь захотел видеть курсы постранично
-            $perPage = Input::get('per_page');
-        }
+         **/
+        $perPage = Input::get('per_page', 5);//Количество курсов на странице по умолчанию
 
         if (Input::has('current_page')) {
             $currentPage = Input::get('current_page');
@@ -52,84 +47,62 @@ class CourseComponent
          *     *
          * @return \Illuminate\Pagination\Paginator
          */
-        $params = CourseComponent::setParamPages();
+        $params = CourseComponent::getParamPages();
         $courses = Course::paginate($params['perPage'], array('id', 'name'));
         return $courses;
+
     }
 
-    static public function storeCourse()
+    /**Запись и сохранение курса
+     * в случае удачи - возвращаем true,иначе false
+     * */
+    public function storeCourse()
     {
-        /**Запись и сохранение курса
-         * в случае удачи - возвращаем true,иначе false
-         * @return BooleanType
-         * */
-
         //Проверка радостей от пользователя
+        $validator = Validator::make(
+            Input::only(['name']),
+            array('name' => array('required', 'min:5'))
+        );
+
+        if ($validator->passes()) {
+            //Прошла валидация
+            $course = new Course();
+            $course->name = Input::get('name');
+            $result = $course->save();
+            //Присовим часть атрибутов
+            $this->courseName = $course->name;
+            $this->courseId = $course->id;
+            $this->errors = null;
+        } else {
+            //Все немного хуже и данные не валидны
+            //Отдадим ошибки обратно клиенту
+            $this->errors = $validator->messages();
+            $result = false;
+        }
+        return $result;
+
+    }
+
+    public function updateCourse($id)
+    {
+        //Обновление
+        $course = Course::findOrFail($id);
         $validator = Validator::make(
             array('name' => Input::get('name')),
             array('name' => array('required', 'min:5'))
         );
 
         if ($validator->passes()) {
-            dd($validator);
-
-            //Прошла валидация
-
-            $course = new Course();
             $course->name = Input::get('name');
-            $course->save();
+            $result = $course->save();
+            $this->courseId = $course->id;
+            $this->errors = null;
 
-            //т.к у нас тепреь есть новая модель,
-            //но контроллеры о ней ничего еще не знают-
-            //положим упоминание о ней в Message Bag,чтоб они смогли прочитать
-            $messageBag = new MessageBag;
-            $messageBag->add('courseId', $course->id);
-
-            $message = 'Course ' . $course->name . ' been successful created';
-            $status = 'success';
-            $result = true;
         } else {
-            //Все немного хуже и данные не валидны
-            $message = 'Course not been successful created';
-            $status = 'fail';
+            $this->errors = $validator->messages();
             $result = false;
         }
-
-        //Вложим в сессию итог действия
-
-        Session::put('message',$message);
-        Session::put('status',$status);
-
         return $result;
-
-    }
-
-    static public function updateCourse($id)
-    {
-        //Обновление
-        $course = Course::findOrFail($id);
-
-        $validator = Validator::make(
-            array('Course name' => Input::get('name')),
-            array('Course name' => array('required', 'min:5'))
-        );
-
-        if ($validator->passes()) {
-            $course->name = Input::get('name');
-            $course->save();
-
-            $message = 'Course ' . $course->name . ' been successful updated';
-            $status = 'success';
-
-        } else {
-            $message = $validator->messages();
-            $status = 'fail';
-        }
-
-        return array(
-            'message' => $message,
-            'status' => $status
-        );
 
     }
 
@@ -140,30 +113,20 @@ class CourseComponent
         return $course;
     }
 
-    static public function deleteCourse($id)
+    public function deleteCourse($id)
     {
-        try {
-            $course = Course::findOrFail($id);
-            $course->delete();
-            if (Course::find($id) == null){
-                //Курса нет более
-                $message = 'Course ' . $course->name . ' been successful deleted';
-                $status = 'success';
-            } else {
-                $message = 'Course ' . $course->name . ' not been  deleted';
-                $status = 'fail';
-            }
-        } catch (ModelNotFoundException $e) {
-            //Мимо.Нет такой страницы
-            $message = 'Course not found';
-            $status = 'fail';
+        $course = Course::findOrFail($id);
+        $course->delete();
+
+        if (null == Course::find($id)) {
+            //Нет упоминаний о курсе и удаление прошло
+            $this->courseId = null;
+            $result = true;
+        } else {
+            $this->courseId = $course->id;
+            $result = false;
         }
 
-        return array(
-            'message' => $message,
-            'status' => $status
-        );
-
-
+        return $result;
     }
-} 
+}

@@ -17,7 +17,15 @@ namespace Yalms\Models\Courses;
  * @method static Course all()
  * @method static Course findOrFail($id)
  * @method static Course paginate($id)
- *
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Lesson[] $lessons
+ * @property-read \Illuminate\Database\Eloquent\Collection|\UserStudent[] $students
+ * @property-read \UserTeacher $teacher
+ * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Courses\Course whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Courses\Course whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Courses\Course whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Courses\Course whereUpdatedAt($value)
  */
 class Course extends \Eloquent {
 

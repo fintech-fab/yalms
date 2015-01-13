@@ -1,13 +1,10 @@
 <?php
 namespace app\controllers\Api\User;
 
-use Input;
-use Request;
 use Response;
 use Yalms\Models\Users\User;
-use Yalms\Models\Users\UserAdmin;
-use Yalms\Models\Users\UserStudent;
-use Yalms\Models\Users\UserTeacher;
+use Yalms\Component\User\UserComponent;
+use Input;
 
 class UserController extends \BaseController
 {
@@ -19,15 +16,10 @@ class UserController extends \BaseController
 	 */
 	public function index()
 	{
-		$perPage = 30; //Количество строк на странице по умолчанию
-		if (Input::has('per_page')) {
-			$perPage = Input::get('per_page');
-		}
-
-		$users = User::whereEnabled('1')
-			->paginate($perPage, array('id', 'first_name', 'middle_name', 'last_name'));
-
-		return Response::json($users);
+		return Response::json(
+		// Параметр означает условие запроса enabled=='1'
+			UserComponent::showUsers('1')
+		);
 	}
 
 
@@ -49,48 +41,23 @@ class UserController extends \BaseController
 	 */
 	public function store()
 	{
-		$phone = trim(Request::get('phone'));
-		if (empty($phone)) {
-			return [
-				'result'  => false,
-				'message' => 'Data has not been entered'
-			];
+		$userComp = new UserComponent(Input::all());
+		$result = $userComp->storeNewUser();
+
+		if ($result) {
+			$user = User::find(
+				$userComp->user->id,
+				array('id', 'first_name', 'middle_name', 'last_name', 'email', 'phone')
+			);
+
+			return Response::json($user, 201);
 		}
 
-		$countPhones = User::wherePhone($phone)->count();
-		if ($countPhones > 0) {
-			return [
+		return Response::json(array(
 				'result'  => false,
-				'message' => 'This user already exists'
-			];
-		}
-
-		$user = new User;
-		$user->first_name = Input::get('first_name');
-		$user->middle_name = Input::get('middle_name');
-		$user->last_name = Input::get('last_name');
-		$user->email = Input::get('email');
-		$user->phone = Input::get('phone');
-		$user->password = Input::get('password');
-
-		$user->save();
-
-		$admin = new UserAdmin;
-		$admin->user_id = $user->id;
-		$admin->save();
-
-		$teacher = new UserTeacher;
-		$teacher->user_id = $user->id;
-		$teacher->save();
-
-		$student = new UserStudent;
-		$student->user_id = $user->id;
-		$student->save();
-
-		return [
-			'result'  => true,
-			'message' => 'This user is saved'
-		];
+				'message' => $userComp->message
+			)
+		);
 	}
 
 
@@ -106,7 +73,6 @@ class UserController extends \BaseController
 		$user = User::findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name', 'email', 'phone'));
 
 		return Response::json($user);
-
 	}
 
 
@@ -119,7 +85,22 @@ class UserController extends \BaseController
 	 */
 	public function edit($id)
 	{
-		//
+		$user = User::findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name', 'email', 'phone'));
+
+		$fields = array(
+			'last_name'             => 'Фамилия',
+			'first_name'            => 'Имя',
+			'middle_name'           => 'Отчество',
+			'email'                 => 'Электронная почта',
+			'password'              => 'Пароль',
+			'password_confirmation' => 'Подтверждение пароля'
+		);
+
+		return Response::json(array(
+				'user'        => $user,
+				'edit_fields' => $fields
+			)
+		);
 	}
 
 
@@ -132,7 +113,21 @@ class UserController extends \BaseController
 	 */
 	public function update($id)
 	{
-		//
+		$userComponent = new UserComponent(\Input::all());
+		$result = $userComponent->update($id);
+
+		if ($userComponent->status == 404) {
+			return Response::json($userComponent->message, 404);
+		}
+		if ($result) {
+			return $this->show($id);
+		}
+
+		return Response::json(array(
+				'result' => false,
+				'errors' => $userComponent->message
+			)
+		);
 	}
 
 
@@ -145,7 +140,13 @@ class UserController extends \BaseController
 	 */
 	public function destroy($id)
 	{
-		//
+		$userComponent = new UserComponent();
+
+		return Response::json(array(
+				'result'  => $userComponent->destroy($id),
+				'message' => $userComponent->message
+			)
+		);
 	}
 
 

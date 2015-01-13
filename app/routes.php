@@ -14,13 +14,21 @@
 Route::get('/', function () {
 	return View::make('hello');
 });
+Route::get('/registration', 'UserSignController@register');
+/*Route::get('/loginFacebook', 'Facebook');*/
+Route::get('/loginFacebook', 'UserSignController@loginFacebook');
 
+Route::post('/login', 'UserSignController@login');
+Route::post('/registration', 'UserSignController@registration');
 
 Route::resource('student', 'StudentController');
 Route::resource('teacher', 'TeacherController');
-Route::resource('course',  'CourseController');
+Route::resource('course', 'CourseController');
 
 Route::group(array('prefix' => 'api/v1'), function () {
 	Route::resource('user', 'app\controllers\Api\User\UserController');
-    Route::resource('course', 'app\controllers\Api\Course\CourseController');
+	Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');
+	Route::resource('student', 'app\controllers\Api\User\UserStudentController');
+
+	Route::resource('course', 'app\controllers\Api\Course\CourseController');
 });

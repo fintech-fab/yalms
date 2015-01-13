@@ -18,6 +18,12 @@ body {
       };
   }
 
+  form{
+    & .error{
+      background: rgba(255, 0, 0, 0.31);
+    }
+  }
+
 
   & .success{
     background: #bcdda9;

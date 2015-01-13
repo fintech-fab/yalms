@@ -1,12 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\View;
+use Redirect;
+use View;
 use Yalms\Component\Course\CourseComponent;
 use Yalms\Models\Courses\Course;
 
+
 class CourseController extends \BaseController
 {
+
 
     public function index()
     {
@@ -18,19 +20,6 @@ class CourseController extends \BaseController
     {
         //Форма создания нового курса
         return View::make('pages.course.create');
-    }
-
-    public function store()
-    {
-        $courseComponent = new CourseComponent;
-        $courseSuccessCreated = $courseComponent->storeCourse();
-        if($courseSuccessCreated){
-            //Отсылка к странице новосозданомого курсу
-            return Redirect::action('CourseController@show');
-        }
-        else
-            //Вертаем на страницу создания с соответствующим оповещением
-            return Redirect::action('CourseController@create')->withErrors();
     }
 
     public function show($id)
@@ -47,30 +36,48 @@ class CourseController extends \BaseController
         return View::make('pages.course.edit', compact('courseName', 'url'));
     }
 
+    public function store()
+    {
+
+        $courseComponent = new CourseComponent;
+        $courseSuccessCreated = $courseComponent->storeCourse();
+
+        if ($courseSuccessCreated) {
+            //Отсылка к странице новосозданомого курсу
+            $id = $courseComponent->courseId;
+            return Redirect::action('CourseController@show', array($id));
+        } else {
+            //Вертаем на страницу создания с соответствующим оповещением
+            return Redirect::action('CourseController@create')
+                ->withErrors($courseComponent->errors);
+        }
+    }
+
+
     public function update($id)
     {
-        $result = CourseComponent::updateCourse($id);
-        $message = $result['message'];
-        $status = $result['status'];
-        //Покажем что мы там обновили
-        return Redirect::action('CourseController@show', array($id))
-            ->with('message', $message)
-            ->with('status',$status);
+        $courseComponent = new CourseComponent;
+        $courseSuccessUpdated = $courseComponent->updateCourse($id);
+        if ($courseSuccessUpdated) {
+            //Отсылка к странице измененому курсу,увидим что мы там обновили
+            return Redirect::action('CourseController@show', array($id));
+        } else
+            //Просмотр объекта с соответствующим оповещением
+            return Redirect::action('CourseController@edit', array($id))
+                ->withErrors($courseComponent->errors);
     }
 
     public function destroy($id)
     {
-        $result = CourseComponent::deleteCourse($id);
-        $message = $result['message'];
-        $status = $result['status'];
+        $courseComponent = new CourseComponent;
+        $courseDeleted = $courseComponent->deleteCourse($id);
 
-        //Отправим на заглавную страницу всех курсов
-        //после редиректа от функции удаления.
-        //Тогда у нас есть некое статусное сообщение($message),
-        //которое необходимо отрисовать на странице.
-
-        return Redirect::action('CourseController@index')
-            ->with('message', $message)
-            ->with('status',$status);
+        if ($courseDeleted) {
+            //Отсылка к странице измененому курсу,увидим что мы там обновили
+            return Redirect::action('CourseController@index');
+        } else
+            //Просмотр объекта с соответствующим оповещением
+            return Redirect::action('CourseController@index')
+                ->withErrors($courseComponent->errors);
     }
 }
