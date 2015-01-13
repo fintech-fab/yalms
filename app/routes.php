@@ -26,6 +26,30 @@ Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
 Route::group(array('prefix' => 'api/v1'), function () {
+
+	\App::error(function (\Exception $exception, $code) {
+		if ($code >= 500) {
+			Log::error($exception);
+		}
+
+		return Response::json(array(
+				'message'   => $exception->getMessage(),
+				'errors'    => array()
+			),
+			$code
+		);
+	});
+	\App::error(function (Illuminate\Database\Eloquent\ModelNotFoundException $exception, $code) {
+		$modelName = explode("\\", $exception->getModel());
+
+		return Response::json(array(
+				'message' => array_pop($modelName) . ' not found',
+				'errors'  => array()
+			),
+			404
+		);
+	});
+
 	Route::resource('user', 'app\controllers\Api\User\UserController');
 	Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');
 	Route::resource('student', 'app\controllers\Api\User\UserStudentController');

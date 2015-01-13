@@ -1,21 +1,43 @@
 <?php
 namespace app\controllers\Api\User;
 
+use Input;
 use Response;
+use app\controllers\Api\BaseApiController;
 use Yalms\Component\User\UserComponent;
 use Yalms\Models\Users\UserStudent;
+use Yalms\Models\Users\User;
 
-class UserStudentController extends \BaseController
+class UserStudentController extends BaseApiController
 {
 
 	/**
 	 * Display a listing of the resource.
 	 *
+	 * Параметры:
+	 *      page — N страницы,
+	 *      per_page — количество на странице.
+	 *      sort = created|updated   Сортировка по полю  "created_at" или "updated_at", по умолчанию "created"
+	 *      direction = asc|desc     Направление сортировки, по умолчанию "desc"
+	 *
 	 * @return Response
 	 */
 	public function index()
 	{
-		//
+		$userComponent = new UserComponent(Input::only(
+			array('page', 'per_page', 'sort', 'direction')
+		));
+		$params = $userComponent->getParameters();
+
+		$student = UserStudent::whereEnabled(1)->with(array(
+					'user' => function ($query) {
+							/** @var User $query */
+							$query->whereEnabled(true);
+						}
+				)
+		)->orderBy($params->sort, $params->direction)->paginate($params->per_page);
+
+		return Response::json($student);
 	}
 
 
@@ -26,10 +48,7 @@ class UserStudentController extends \BaseController
 	 */
 	public function create()
 	{
-		return Response::json(
-			array('Status' => 404, 'Message' => 'Not Found'),
-			404
-		);
+		return $this->clientError(405);
 	}
 
 
@@ -40,10 +59,7 @@ class UserStudentController extends \BaseController
 	 */
 	public function store()
 	{
-		return Response::json(
-			array('Status' => 404, 'Message' => 'Not Found'),
-			404
-		);
+		return $this->clientError(405);
 	}
 
 
@@ -56,16 +72,10 @@ class UserStudentController extends \BaseController
 	 */
 	public function show($id)
 	{
-		$student = UserStudent::find($id, array('user_id', 'enabled'));
+		User::whereEnabled(true)->findOrFail($id);
+		$student = UserStudent::with('user')->find($id, array('user_id', 'enabled'));
 
-		if (empty($student->user_id)) {
-			return Response::json(
-				array(),
-				204 //No Content
-			);
-		}
-
-		return Response::json(['enabled' => $student->enabled]);
+		return Response::json(['student' => $student]);
 	}
 
 
@@ -78,7 +88,17 @@ class UserStudentController extends \BaseController
 	 */
 	public function edit($id)
 	{
-		//
+		$user = User::whereEnabled(true)->findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name'));
+
+		return Response::json(array(
+			'student' => array(
+				'id'      => $id,
+				'enabled' => UserStudent::find($id)->enabled,
+				'user'    => $user
+			),
+			'edit_fields'     => array('enabled' => 'Назначить студентом'),
+			'required_fields' => array('enabled')
+		));
 	}
 
 
@@ -91,13 +111,13 @@ class UserStudentController extends \BaseController
 	 */
 	public function update($id)
 	{
-		$userComponent = new UserComponent;
+		$userComponent = new UserComponent(Input::all());
 
-		return Response::json(array(
-				'result'  => $userComponent->updateStudent($id),
-				'message' => $userComponent->message
-			)
-		);
+		if ($userComponent->updateStudent($id) == UserComponent::FAILED_VALIDATION) {
+			return $this->responseError($userComponent->getMessage(), $userComponent->getErrors());
+		}
+
+		return $this->show($id);
 	}
 
 
@@ -109,10 +129,7 @@ class UserStudentController extends \BaseController
 	 */
 	public function destroy()
 	{
-		return Response::json(
-			array('Status' => 404, 'Message' => 'Not Found'),
-			404
-		);
+		return $this->clientError(405);
 	}
 
 

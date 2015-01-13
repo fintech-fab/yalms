@@ -19,6 +19,8 @@ use Yalms\Models\Courses\Course;
  * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Users\UserTeacher whereEnabled($value)
  * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Users\UserTeacher whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\Yalms\Models\Users\UserTeacher whereUpdatedAt($value)
+ * @method static UserTeacher findOrFail($id)
+ * @method static UserTeacher whereEnabled($boolean)
  */
 class UserTeacher extends Eloquent
 {
@@ -34,6 +36,14 @@ class UserTeacher extends Eloquent
 	public function courses()
 	{
 		return $this->hasMany(Course::class, 'user_teacher_id');
+	}
+
+	/**
+	 * @return User
+	 */
+	public function user()
+	{
+		return $this->belongsTo(User::class);
 	}
 
 

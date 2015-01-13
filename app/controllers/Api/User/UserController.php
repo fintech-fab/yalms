@@ -1,12 +1,14 @@
 <?php
 namespace app\controllers\Api\User;
 
+use Input;
 use Response;
+use app\controllers\Api\BaseApiController;
 use Yalms\Models\Users\User;
 use Yalms\Component\User\UserComponent;
-use Input;
 
-class UserController extends \BaseController
+
+class UserController extends BaseApiController
 {
 
 	/**
@@ -16,9 +18,10 @@ class UserController extends \BaseController
 	 */
 	public function index()
 	{
+		$userComp = new UserComponent(Input::all());
+
 		return Response::json(
-		// Параметр означает условие запроса enabled=='1'
-			UserComponent::showUsers('1')
+			$userComp->showUsers()
 		);
 	}
 
@@ -30,7 +33,24 @@ class UserController extends \BaseController
 	 */
 	public function create()
 	{
-		//
+
+		return Response::json(array(
+			'edit_fields'     => array(
+				'last_name'             => 'Фамилия',
+				'first_name'            => 'Имя',
+				'middle_name'           => 'Отчество',
+				'email'                 => 'Электронная почта',
+				'phone'                 => 'Номер телефона',
+				'password'              => 'Пароль',
+				'password_confirmation' => 'Подтверждение пароля'
+			),
+			'required_fields' => array(
+				'first_name',
+				'phone',
+				'password',
+				'password_confirmation'
+			)
+		));
 	}
 
 
@@ -42,22 +62,12 @@ class UserController extends \BaseController
 	public function store()
 	{
 		$userComp = new UserComponent(Input::all());
-		$result = $userComp->storeNewUser();
 
-		if ($result) {
-			$user = User::find(
-				$userComp->user->id,
-				array('id', 'first_name', 'middle_name', 'last_name', 'email', 'phone')
-			);
-
-			return Response::json($user, 201);
+		if ($userComp->storeNewUser() == UserComponent::FAILED_VALIDATION) {
+			return $this->responseError($userComp->getMessage(), $userComp->getErrors());
 		}
 
-		return Response::json(array(
-				'result'  => false,
-				'message' => $userComp->message
-			)
-		);
+		return $this->show($userComp->user->id, 201);
 	}
 
 
@@ -65,14 +75,16 @@ class UserController extends \BaseController
 	 * Display the specified resource.
 	 *
 	 * @param  int $id
+	 * @param int  $statusHttp
 	 *
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($id, $statusHttp = 200)
 	{
-		$user = User::findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name', 'email', 'phone'));
+		$user = User::with('teacher', 'student', 'admin')
+			->findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name', 'email', 'phone'));
 
-		return Response::json($user);
+		return Response::json(['user' => $user], $statusHttp);
 	}
 
 
@@ -114,20 +126,12 @@ class UserController extends \BaseController
 	public function update($id)
 	{
 		$userComponent = new UserComponent(\Input::all());
-		$result = $userComponent->update($id);
 
-		if ($userComponent->status == 404) {
-			return Response::json($userComponent->message, 404);
-		}
-		if ($result) {
-			return $this->show($id);
+		if ($userComponent->update($id) == UserComponent::FAILED_VALIDATION) {
+			return $this->responseError($userComponent->getMessage(), $userComponent->getErrors());
 		}
 
-		return Response::json(array(
-				'result' => false,
-				'errors' => $userComponent->message
-			)
-		);
+		return $this->show($id);
 	}
 
 
@@ -141,12 +145,9 @@ class UserController extends \BaseController
 	public function destroy($id)
 	{
 		$userComponent = new UserComponent();
+		$userComponent->destroy($id);
 
-		return Response::json(array(
-				'result'  => $userComponent->destroy($id),
-				'message' => $userComponent->message
-			)
-		);
+		return $this->responseSuccess($userComponent->getMessage());
 	}
 
 
