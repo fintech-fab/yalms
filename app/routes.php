@@ -55,4 +55,6 @@ Route::group(array('prefix' => 'api/v1'), function () {
 	Route::resource('student', 'app\controllers\Api\User\UserStudentController');
 
 	Route::resource('course', 'app\controllers\Api\Course\CourseController');
+
+	Route::post('role', 'app\controllers\Api\Role\RoleController@setRoleState');
 });
