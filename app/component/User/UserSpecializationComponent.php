@@ -22,7 +22,7 @@ class UserSpecializationComponent {
         'enable' => 'required|in:true,false'
 
     );
-	protected $input;
+	protected $input=array();
 
 	public $validator;
 
@@ -31,11 +31,11 @@ class UserSpecializationComponent {
 	 */
 	public function __construct(Array $input)
 	{
-
-		$this->validator = Validator::make($input, $this->rules);
-		$this->input = $input;
-
-
+        foreach($input as $key => $val)
+        {
+	        $this->input[trim($key)] = trim($val);
+        }
+		$this->validator = Validator::make($this->input, $this->rules);
 	}
 
 	public function specialize()
