@@ -51,10 +51,13 @@ Route::group(array('prefix' => 'api/v1'), function () {
 	});
 
 	Route::resource('user', 'app\controllers\Api\User\UserController');
+
+	Route::post('user/specialization', 'app\controllers\Api\User\UserController@setSpecialization');
+
 	Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');
 	Route::resource('student', 'app\controllers\Api\User\UserStudentController');
 
 	Route::resource('course', 'app\controllers\Api\Course\CourseController');
 
-	Route::post('role', 'app\controllers\Api\Role\RoleController@setRoleState');
+
 });

@@ -4,6 +4,7 @@ namespace app\controllers\Api\User;
 use Input;
 use Response;
 use app\controllers\Api\BaseApiController;
+use Yalms\Component\User\UserSpecializationComponent;
 use Yalms\Models\Users\User;
 use Yalms\Component\User\UserComponent;
 
@@ -150,5 +151,19 @@ class UserController extends BaseApiController
 		return $this->responseSuccess($userComponent->getMessage());
 	}
 
+	public function setSpecialization()
+	{
+		$usc = new UserSpecializationComponent(Input::all());
+
+		if($usc->validator->fails())
+		{
+			return $this->responseError($usc->validator->messages(), $usc->validator->failed());
+		}
+
+		$usc->specialize();
+
+		return $this->responseSuccess('Specialization Ok');
+
+	}
 
 }
