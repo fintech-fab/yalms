@@ -25,7 +25,9 @@ Route::resource('student', 'StudentController');
 Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
-Route::group(array('prefix' => 'api/v1'), function () {
+Route::group(array('prefix' => 'api/v1'),
+
+	function () {
 
 	\App::error(function (\Exception $exception, $code) {
 		if ($code >= 500) {
@@ -52,6 +54,12 @@ Route::group(array('prefix' => 'api/v1'), function () {
 
 	Route::resource('user', 'app\controllers\Api\User\UserController');
 
+	/* Этот маршрут включает и выключает специализацию пользователя
+	   параметры
+	   id - номер пользователя в базе
+	   specialization - специализация ( admin student teacher )
+	   enable - устанавливаемое состояние : true - включена, false - выключена
+	*/
 	Route::post('user/specialization', 'app\controllers\Api\User\UserController@setSpecialization');
 
 	Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');

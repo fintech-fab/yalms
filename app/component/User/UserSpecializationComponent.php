@@ -31,10 +31,7 @@ class UserSpecializationComponent {
 	 */
 	public function __construct(Array $input)
 	{
-        foreach($input as $key => $val)
-        {
-	        $this->input[trim($key)] = trim($val);
-        }
+		$this->input = array_map('trim',$input);
 		$this->validator = Validator::make($this->input, $this->rules);
 	}
 
