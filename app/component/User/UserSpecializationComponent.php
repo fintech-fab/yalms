@@ -66,7 +66,7 @@ class UserSpecializationComponent {
 
 			$user->enabled = $this->input['enable'] == 'true' ? 1 : 0 ;
 
-			$user->push();
+			$user->save();
 
 
 		}
