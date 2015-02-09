@@ -4,6 +4,7 @@ namespace app\controllers\Api\User;
 use Input;
 use Response;
 use app\controllers\Api\BaseApiController;
+use Yalms\Component\User\UserStudentComponent;
 use Yalms\Component\User\UserComponent;
 use Yalms\Models\Users\UserStudent;
 use Yalms\Models\Users\User;
@@ -59,7 +60,16 @@ class UserStudentController extends BaseApiController
 	 */
 	public function store()
 	{
-		return $this->clientError(405);
+		$usc = new UserStudentComponent(Input::all());
+
+		if($usc->validator->fails())
+		{
+			return $this->responseError($usc->validator->messages(), $usc->validator->failed());
+		}
+
+		$usc->store();
+
+		return $this->responseSuccess('Ok');
 	}
 
 

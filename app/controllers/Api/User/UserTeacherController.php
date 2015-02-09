@@ -5,6 +5,7 @@ use Input;
 use Response;
 use app\controllers\Api\BaseApiController;
 use Yalms\Component\User\UserComponent;
+use Yalms\Component\User\UserTeacherComponent;
 use Yalms\Models\Users\UserTeacher;
 use Yalms\Models\Users\User;
 
@@ -59,7 +60,17 @@ class UserTeacherController extends BaseApiController
 	 */
 	public function store()
 	{
-		return $this->clientError(405);
+		$utc = new UserTeacherComponent(Input::all());
+
+		if($utc->validator->fails())
+		{
+			return $this->responseError($utc->validator->messages(), $utc->validator->failed());
+		}
+
+		$utc->store();
+
+		return $this->responseSuccess('Ok');
+
 	}
 
 
