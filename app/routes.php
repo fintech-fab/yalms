@@ -26,42 +26,46 @@ Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
 Route::group(array('prefix' => 'api/v1'),
-
 	function () {
 
-	\App::error(function (\Exception $exception, $code) {
-		if ($code >= 500) {
-			Log::error($exception);
-		}
 
-		return Response::json(array(
-				'message'   => $exception->getMessage(),
-				'errors'    => array()
+		\App::error(function (\Exception $exception, $code) {
+			if ($code >= 500) {
+				Log::error($exception);
+			}
+
+
+			return Response::json(array(
+				'message' => $exception->getMessage(),
+				'errors'  => array()
 			),
-			$code
-		);
-	});
-	\App::error(function (Illuminate\Database\Eloquent\ModelNotFoundException $exception, $code) {
-		$modelName = explode("\\", $exception->getModel());
+				$code
+			);
 
-		return Response::json(array(
+		});
+
+		\App::error(function (Illuminate\Database\Eloquent\ModelNotFoundException $exception, $code) {
+			$modelName = explode("\\", $exception->getModel());
+
+			return Response::json(array(
 				'message' => array_pop($modelName) . ' not found',
 				'errors'  => array()
 			),
-			404
-		);
-	});
+				404
+			);
+		});
+
 
 		Route::resource('user', 'app\controllers\Api\User\UserController');
 
 
-	/* Этот маршрут включает и выключает специализацию пользователя
-	   параметры
-	   id - номер пользователя в базе
-	   specialization - специализация ( admin student teacher )
-	   enable - устанавливаемое состояние : true - включена, false - выключена
-	*/
-		Route::post('user/specialization', 'app\controllers\Api\User\UserController@setSpecialization');
+		/* Этот маршрут включает и выключает профили пользователя
+		   параметры
+		   id - номер пользователя в базе
+		   profile - профиль пользователя ( admin student teacher )
+		   enable - устанавливаемое состояние : t1 - включён, 0 - выключен
+		*/
+		Route::post('user/profile', 'app\controllers\Api\User\UserController@updateProfile');
 
 
 		Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');
@@ -71,4 +75,4 @@ Route::group(array('prefix' => 'api/v1'),
 		Route::resource('course', 'app\controllers\Api\Course\CourseController');
 
 
-});
+	});

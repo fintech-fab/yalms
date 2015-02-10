@@ -15,15 +15,15 @@ class AddColumnsToUserStudentTable extends Migration {
 		Schema::table('user_student', function(Blueprint $table)
 		{
 			// где и на кого учился
-			$table->text('education');
+			$table->string('education', 1000);
 			// кем и сколько работал
-			$table->text('job_before');
+			$table->string('job_before', 2000);
 			// работает ли сейчас и если да, то кем
-			$table->text('job_now');
+			$table->string('job_now', 200);
 			// пожелания по методике обучения
-			$table->text('wishes_by_a_training_technique');
+			$table->string('wishes_by_a_training_technique', 2000);
 			// всё что дополнительно хочет сообщить о себе
-			$table->text('additional_info');
+			$table->string('additional_info', 5000);
 
 		});
 	}

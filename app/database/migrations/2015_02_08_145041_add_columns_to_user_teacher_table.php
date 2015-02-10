@@ -15,21 +15,21 @@ class AddColumnsToUserTeacherTable extends Migration {
 		Schema::table('user_teacher', function(Blueprint $table)
 		{
 			// где и на кого учился
-			$table->text('education');
+			$table->string('education', 1000);
             // кем и сколько работал до начала преподавательской деятельности
-			$table->text('job_before');
+			$table->string('job_before', 2000);
 			// работает ли сейчас и если да, то кем
-			$table->text('job_now');
+			$table->text('job_now', 200);
 			// проходил ли, и если проходил, то где, специальное обучение на преподавателя
-			$table->text('teacher_training');
+			$table->text('teacher_training', 400);
 			// преподавательский стаж
-			$table->integer('teaching_experience');
+			$table->integer('teaching_experience')->unsigned()->default(0);
 			// методика обучения
-			$table->text('training_technique');
+			$table->string('training_technique', 5000);
 			// требования к студенту
-			$table->text('requirements_to_student');
+			$table->string('requirements_to_student', 2000);
 			// всё что дополнительно хочет сообщить о себе
-			$table->text('additional_info');
+			$table->string('additional_info', 5000);
 
 		});
 	}

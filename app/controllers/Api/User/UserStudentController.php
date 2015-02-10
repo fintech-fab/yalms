@@ -31,11 +31,11 @@ class UserStudentController extends BaseApiController
 		$params = $userComponent->getParameters();
 
 		$student = UserStudent::whereEnabled(1)->with(array(
-					'user' => function ($query) {
-							/** @var User $query */
-							$query->whereEnabled(true);
-						}
-				)
+				'user' => function ($query) {
+					/** @var User $query */
+					$query->whereEnabled(true);
+				}
+			)
 		)->orderBy($params->sort, $params->direction)->paginate($params->per_page);
 
 		return Response::json($student);
@@ -62,19 +62,16 @@ class UserStudentController extends BaseApiController
 	{
 		$usc = new UserStudentComponent(Input::all());
 
-		if($usc->validator->fails())
-		{
-			return $this->responseError($usc->validator->messages(), $usc->validator->failed());
+		if (!$usc->store()) {
+			return $this->responseError($usc->getMessage(), $usc->getErrors());
 		}
 
-		$usc->store();
-
-		return $this->responseSuccess('Ok');
+		return $this->responseSuccess($usc->getMessage());
 	}
 
 
 	/**
-	 * Display the specified resource.
+	 * Display the specified resource
 	 *
 	 * @param  int $id
 	 *
@@ -101,7 +98,7 @@ class UserStudentController extends BaseApiController
 		$user = User::whereEnabled(true)->findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name'));
 
 		return Response::json(array(
-			'student' => array(
+			'student'         => array(
 				'id'      => $id,
 				'enabled' => UserStudent::find($id)->enabled,
 				'user'    => $user

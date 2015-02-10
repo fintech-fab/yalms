@@ -151,18 +151,17 @@ class UserController extends BaseApiController
 		return $this->responseSuccess($userComponent->getMessage());
 	}
 
-	public function setSpecialization()
-	{
-		$usc = new UserSpecializationComponent(Input::all());
 
-		if($usc->validator->fails())
-		{
-			return $this->responseError($usc->validator->messages(), $usc->validator->failed());
+	// включает и выключает профили пользователя по маршруту user/profile
+	public function updateProfile()
+	{
+		$userComponent = new UserComponent(Input::all());
+
+		if (!$userComponent->updateProfile()) {
+			return $this->responseError($userComponent->getMessage(), $userComponent->getErrors());
 		}
 
-		$usc->specialize();
-
-		return $this->responseSuccess('Specialization Ok');
+		return $this->responseSuccess('Профиль обновлён успешно');
 
 	}
 

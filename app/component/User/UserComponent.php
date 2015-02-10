@@ -2,6 +2,7 @@
 namespace Yalms\Component\User;
 
 use Validator;
+use Input;
 use Yalms\Models\Users\User;
 use Yalms\Models\Users\UserAdmin;
 use Yalms\Models\Users\UserStudent;
@@ -27,7 +28,7 @@ class UserComponent
 
 	public function __construct($input = null)
 	{
-		$this->input = empty($input) ? array() : $input;
+		$this->input = empty($input) ? array() : array_map('trim', $input);
 	}
 
 	/**
@@ -62,10 +63,10 @@ class UserComponent
 	 * @var array
 	 */
 	private $errorMessages = array(
-		'required'   => 'Поле должно быть заполнено обязательно!',
-		'unique'     => ':attribute с таким значением уже есть.',
-		'email'      => 'Должен быть корректный адрес электронной почты.',
-		'alpha_dash' => 'Должны быть только латинские символы, цифры, знаки подчёркивания (_) и дефисы (-).',
+		'required'           => 'Поле должно быть заполнено обязательно!',
+		'unique'             => ':attribute с таким значением уже есть.',
+		'email'              => 'Должен быть корректный адрес электронной почты.',
+		'alpha_dash'         => 'Должны быть только латинские символы, цифры, знаки подчёркивания (_) и дефисы (-).',
 		'confirmed'          => 'Подтверждение для :attribute не выполнено.',
 		'password.confirmed' => 'Пароли не совпадают.',
 		'min'                => ':attribute должен быть не меньше :min символов',
@@ -83,6 +84,7 @@ class UserComponent
 		'direction' => 'desc',
 		'state'     => 'enabled'
 	);
+
 	/**
 	 * Проверка параметров запроса множественных данных (страницы, сортировка и пр.)
 	 * и установка значений по умолчанию
@@ -144,7 +146,7 @@ class UserComponent
 			$users = User::with('teacher', 'student', 'admin')->orderBy($params->sort, $params->direction)->paginate(
 				$params->per_page,
 				array('id', 'first_name', 'middle_name', 'last_name', 'created_at', 'updated_at')
-				);
+			);
 		} else {
 			$users = User::with('teacher', 'student', 'admin')->whereEnabled($params->state)
 				->orderBy($params->sort, $params->direction)->paginate(
@@ -346,6 +348,51 @@ class UserComponent
 	//*********************************
 	// Профайлы пользователя
 	//*********************************
+
+
+	// обновление профиля пользователя по маршруту user/profile
+	public function updateProfile()
+	{
+		$validator = Validator::make(
+			$this->input,
+			array(
+				'id'      => 'required|integer',
+				'profile' => 'required|in:admin,student,teacher',
+			),
+			array(
+				'required' => 'Поле должно быть заполнено обязательно!',
+				'integer'  => 'Поле должно быть целым положительным числом!',
+				'in'       => 'Введено некорректное значение.'
+			)
+		);
+
+		if ($validator->fails()) {
+			$this->setValidatorMessage($validator);
+
+			return self::FAILED_VALIDATION;
+
+		}
+
+		switch ($this->input['profile']) {
+			case 'teacher':
+
+				return $this->updateTeacher($this->input['id']);
+
+
+			case 'admin':
+
+				return $this->updateAdmin($this->input['id']);
+
+
+			case 'student':
+
+				return $this->updateStudent($this->input['id']);
+
+
+		}
+
+
+	}
 
 	/**
 	 *  Обновление данных профиля пользователя "Admin", с указанным id

@@ -31,11 +31,11 @@ class UserTeacherController extends BaseApiController
 		$params = $userComponent->getParameters();
 
 		$teacher = UserTeacher::whereEnabled(1)->with(array(
-					'user' => function ($query) {
-							/** @var User $query */
-							$query->whereEnabled(true);
-						}
-				)
+				'user' => function ($query) {
+					/** @var User $query */
+					$query->whereEnabled(true);
+				}
+			)
 		)->orderBy($params->sort, $params->direction)->paginate($params->per_page);
 
 		return Response::json($teacher);
@@ -62,14 +62,11 @@ class UserTeacherController extends BaseApiController
 	{
 		$utc = new UserTeacherComponent(Input::all());
 
-		if($utc->validator->fails())
-		{
-			return $this->responseError($utc->validator->messages(), $utc->validator->failed());
+		if (!$utc->store()) {
+			return $this->responseError($utc->getMessage(), $utc->getErrors());
 		}
 
-		$utc->store();
-
-		return $this->responseSuccess('Ok');
+		return $this->responseSuccess($utc->getMessage());
 
 	}
 
@@ -102,7 +99,7 @@ class UserTeacherController extends BaseApiController
 		$user = User::whereEnabled(true)->findOrFail($id, array('id', 'first_name', 'middle_name', 'last_name'));
 
 		return Response::json(array(
-			'teacher' => array(
+			'teacher'         => array(
 				'id'      => $id,
 				'enabled' => UserTeacher::find($id)->enabled,
 				'user'    => $user
