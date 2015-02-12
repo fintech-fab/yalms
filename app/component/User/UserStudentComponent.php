@@ -6,68 +6,32 @@
  * Time: 2:18
  */
 
-namespace Yalms\component\User;
+namespace Yalms\Component\User;
 
 use Validator;
 use Yalms\Models\Users\UserStudent;
 
-class UserStudentComponent
+
+class UserStudentComponent extends UserComponentBase
 {
 
-	const RESULT_OK = true;
-	const FAILED_VALIDATION = false;
-
 	/**
-	 * Принятые данные запроса
-	 *
-	 * @var array
+	 * @param null $input
 	 */
-	private $input = array();
-
 	public function __construct($input = null)
 	{
 		$this->input = empty($input) ? array() : array_map('trim', $input);;
 	}
 
-	/**
-	 * @var string Сообщение о результате выполненных операций
-	 */
-	private $message = '';
+
 
 	/**
-	 * @return string Сообщение о результате выполненных операций
-	 */
-	public function getMessage()
-	{
-		return $this->message;
-	}
-
-	/**
-	 * @var array Сообщение об ошибках проверки данных (Валидатора)
-	 */
-	private $errors = array();
-
-	/**
-	 * @return array Сообщение об ошибках проверки данных (Валидатора)
-	 */
-	public function getErrors()
-	{
-		return $this->errors;
-	}
-
-	/**
-	 * Ошибки валидатора записываются в сообщение
 	 *
-	 * @param object $validator
+	 * сохраняет данные о студенте, маршрут /student метод POST
+	 *
+	 * @return bool
+	 * @throws \ErrorException
 	 */
-	private function setValidatorMessage($validator)
-	{
-		$this->message = 'Найдены ошибки при проверке данных';
-		$this->errors = $validator->messages();
-	}
-
-
-	// сохраняет данные о студенте маршрут /student метод POST
 	public function store()
 	{
 		$validator = Validator::make(

@@ -9,52 +9,20 @@ use Yalms\Models\Users\UserStudent;
 use Yalms\Models\Users\UserTeacher;
 
 
-class UserComponent
+class UserComponent extends UserComponentBase
 {
-	const RESULT_OK = true;
-	const FAILED_VALIDATION = false;
 
 	/**
-	 * @var null|User
+	 * @var
 	 */
-	public $user = null;
+	public $user;
 
 	/**
-	 * Принятые данные запроса
-	 *
-	 * @var array
+	 * @param null $input
 	 */
-	private $input = array();
-
 	public function __construct($input = null)
 	{
 		$this->input = empty($input) ? array() : array_map('trim', $input);
-	}
-
-	/**
-	 * @var string Сообщение о результате выполненных операций
-	 */
-	private $message = '';
-
-	/**
-	 * @return string Сообщение о результате выполненных операций
-	 */
-	public function getMessage()
-	{
-		return $this->message;
-	}
-
-	/**
-	 * @var array Сообщение об ошибках проверки данных (Валидатора)
-	 */
-	private $errors = array();
-
-	/**
-	 * @return array Сообщение об ошибках проверки данных (Валидатора)
-	 */
-	public function getErrors()
-	{
-		return $this->errors;
 	}
 
 	/**
@@ -350,8 +318,17 @@ class UserComponent
 	//*********************************
 
 
-	// обновление профиля пользователя по маршруту user/profile
-	public function updateProfile()
+	/**
+	 *
+	 *  Включение/выключение определённого профиля пользователя
+	 *  $this->input['id'] идентификатор пользователя
+	 *  $this->input['profile'] включаемый/выключаемый профиль (admin,student,teacher)
+	 *  $this->input['enabled'] 1 - включить 0 - выключить
+	 *
+	 * @return bool
+	 * @throws \ErrorException
+	 */
+	public function switchUserProfile()
 	{
 		$validator = Validator::make(
 			$this->input,
@@ -466,6 +443,12 @@ class UserComponent
 		return self::RESULT_OK;
 	}
 
+	/**
+	 *  Проверяет корректность поля enabled в массиве $this->input
+	 *
+	 *
+	 * @return bool
+	 */
 	private function validateProfile()
 	{
 		$validator = Validator::make(
@@ -483,17 +466,6 @@ class UserComponent
 		}
 
 		return true;
-	}
-
-	/**
-	 * Ошибки валидатора записываются в сообщение
-	 *
-	 * @param object $validator
-	 */
-	private function setValidatorMessage($validator)
-	{
-		$this->message = 'Найдены ошибки при проверке данных';
-		$this->errors = $validator->messages();
 	}
 
 

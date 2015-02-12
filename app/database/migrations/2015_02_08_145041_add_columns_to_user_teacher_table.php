@@ -19,9 +19,9 @@ class AddColumnsToUserTeacherTable extends Migration {
             // кем и сколько работал до начала преподавательской деятельности
 			$table->string('job_before', 2000);
 			// работает ли сейчас и если да, то кем
-			$table->text('job_now', 200);
+			$table->string('job_now', 200);
 			// проходил ли, и если проходил, то где, специальное обучение на преподавателя
-			$table->text('teacher_training', 400);
+			$table->string('teacher_training', 400);
 			// преподавательский стаж
 			$table->integer('teaching_experience')->unsigned()->default(0);
 			// методика обучения
