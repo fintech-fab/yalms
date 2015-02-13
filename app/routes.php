@@ -63,7 +63,7 @@ Route::group(array('prefix' => 'api/v1'),
 		   параметры
 		   id - номер пользователя в базе
 		   profile - профиль пользователя ( admin student teacher )
-		   enable - устанавливаемое состояние : t1 - включён, 0 - выключен
+		   enable - устанавливаемое состояние : 1 - включён, 0 - выключен
 		*/
 		Route::post('user/profile', 'app\controllers\Api\User\UserController@switchUserProfile');
 
