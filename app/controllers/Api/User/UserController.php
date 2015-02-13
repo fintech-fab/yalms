@@ -152,12 +152,22 @@ class UserController extends BaseApiController
 	}
 
 
-	// включает и выключает профили пользователя по маршруту user/profile
-	public function updateProfile()
+
+	/**
+	 *
+	 *  Включение/выключение определённого профиля пользователя
+	 *  $this->input['id'] идентификатор пользователя
+	 *  $this->input['profile'] включаемый/выключаемый профиль (admin,student,teacher)
+	 *  $this->input['enabled'] 1 - включить 0 - выключить
+	 *
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function switchUserProfile()
 	{
 		$userComponent = new UserComponent(Input::all());
 
-		if (!$userComponent->updateProfile()) {
+		if (!$userComponent->switchUserProfile()) {
 			return $this->responseError($userComponent->getMessage(), $userComponent->getErrors());
 		}
 
