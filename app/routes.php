@@ -11,7 +11,10 @@
 |
 */
 
-Route::get('/', function () {
+Route::get('/', /**
+ * @return mixed
+ */
+	function () {
 	return View::make('hello');
 });
 Route::get('/registration', 'UserSignController@register');
@@ -26,6 +29,8 @@ Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
 Route::group(array('prefix' => 'api/v1'),
+
+
 	function () {
 
 
@@ -66,6 +71,14 @@ Route::group(array('prefix' => 'api/v1'),
 		   enable - устанавливаемое состояние : 1 - включён, 0 - выключен
 		*/
 		Route::post('user/profile', 'app\controllers\Api\User\UserController@switchUserProfile');
+		/**
+		 *
+		 * этот маршрут служит для проверки емейла и подтверждения реистрации пользователя
+		 * параметр key содержит зашифрованный номер телефона пользователя
+		 *
+		 */
+		Route::get('user/confirm/{key}', array('as' => 'user/confirm',
+		                                 'uses' => 'app\controllers\Api\User\UserController@confirm'));
 
 
 		Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');

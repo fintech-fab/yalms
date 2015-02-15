@@ -60,6 +60,7 @@ class UserController extends BaseApiController
 	 *
 	 * @return Response
 	 */
+
 	public function store()
 	{
 		$userComp = new UserComponent(Input::all());
@@ -67,10 +68,8 @@ class UserController extends BaseApiController
 		if ($userComp->storeNewUser() == UserComponent::FAILED_VALIDATION) {
 			return $this->responseError($userComp->getMessage(), $userComp->getErrors());
 		}
-
 		return $this->show($userComp->user->id, 201);
 	}
-
 
 	/**
 	 * Display the specified resource.
@@ -173,6 +172,25 @@ class UserController extends BaseApiController
 
 		return $this->responseSuccess('Профиль обновлён успешно');
 
+	}
+
+	/**
+	 *
+	 * этот метод подтверждает регистрацию пользователя
+	 * ссылка на соответствующий маршрут передаётся пользователю письмом
+	 * при его создании
+	 *
+	 * @param $key зашифрованный номер телефона пользователя
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 * @throws \ErrorException
+	 */
+	public function confirm($key)
+	{
+		$userComponent = new UserComponent();
+		$userComponent->confirm($key);
+
+		return $this->responseSuccess($userComponent->getMessage());
 	}
 
 }

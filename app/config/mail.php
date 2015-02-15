@@ -28,7 +28,7 @@ return array(
 	|
 	*/
 
-	'host' => 'smtp.mailgun.org',
+	'host' => 'smtp.igoruha.org',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => null, 'name' => null),
+	'from' => array('address' => 'mcprog@igoruha.org', 'name' => 'Игорь Петров'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ return array(
 	|--------------------------------------------------------------------------
 	|
 	| Here you may specify the encryption protocol that should be used when
-	| the application send e-mail messages. A sensible default using the
+	| the application send e-mail messages. A sensible default using theв
 	| transport layer security protocol should provide great security.
 	|
 	*/
@@ -80,7 +80,7 @@ return array(
 	|
 	*/
 
-	'username' => null,
+	'username' => '',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => null,
+	'password' => '',
 
 	/*
 	|--------------------------------------------------------------------------

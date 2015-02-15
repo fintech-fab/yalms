@@ -3,12 +3,20 @@ namespace Yalms\Component\User;
 
 use Validator;
 use Input;
+use Mail;
+use Crypt;
+use URL;
 use Yalms\Models\Users\User;
 use Yalms\Models\Users\UserAdmin;
 use Yalms\Models\Users\UserStudent;
 use Yalms\Models\Users\UserTeacher;
 
 
+/**
+ * Class UserComponent
+ *
+ * @package Yalms\Component\User
+ */
 class UserComponent extends UserComponentBase
 {
 
@@ -166,10 +174,27 @@ class UserComponent extends UserComponentBase
 		try {
 			$this->saveNewUser();
 			$activeConnection->commit();
+
 		} catch (\Exception $error) {
 			$activeConnection->rollBack();
 			throw new \ErrorException('Failed to create new user');
 		}
+
+		/*
+		 *
+		 *  отправка на почту пользователя запроса для подтверждения емейла
+		 *
+		 */
+
+		$confirmURL = URL::route('user/confirm', array(Crypt::encrypt($this->input['phone'])));
+
+		$data = array('confirmURL' => $confirmURL);
+
+		$email = $this->input['email'];
+
+		Mail::queue('emails.confirm.email', $data, function ($message) use ($email) {
+			$message->to($email)->subject('Подтверждение регистрации');
+		});
 
 		return self::RESULT_OK;
 	}
@@ -308,6 +333,35 @@ class UserComponent extends UserComponentBase
 			throw new \ErrorException('Failed to delete data');
 		}
 		$this->message = 'Данные успешно удалены';
+	}
+
+
+	/**
+	 *
+	 * эта функция раскодирует номер телефона
+	 * создаёт соответствующий ему объект пользователя
+	 * и активизирует его ( подтверждает регистрацию )
+	 *
+	 * @param $key
+	 *
+	 * @return bool
+	 * @throws \ErrorException
+	 */
+	public function confirm($key)
+	{
+		$phone = Crypt::decrypt($key);
+
+		$this->user = User::where('phone', '=', $phone)->firstOrFail();
+
+		$this->user->enabled = 1;
+
+		if (!$this->user->save()) {
+			throw new \ErrorException('Failed to save data');
+		}
+
+		$this->message = 'Регистрация подтверждена';
+
+		return self::RESULT_OK;
 	}
 
 
