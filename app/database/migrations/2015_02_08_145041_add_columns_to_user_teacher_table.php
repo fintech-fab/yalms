@@ -12,6 +12,7 @@ class AddColumnsToUserTeacherTable extends Migration {
 	 */
 	public function up()
 	{
+		// не исправлены миграции, а зря :-)
 		Schema::table('user_teacher', function(Blueprint $table)
 		{
 			// где и на кого учился

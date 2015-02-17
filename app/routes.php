@@ -11,6 +11,7 @@
 |
 */
 
+// перекошенный по форматированию кусок кода - зачем?
 Route::get('/', /**
  * @return mixed
  */
@@ -77,8 +78,19 @@ Route::group(array('prefix' => 'api/v1'),
 		 * параметр key содержит зашифрованный номер телефона пользователя
 		 *
 		 */
-		Route::get('user/confirm/{key}', array('as' => 'user/confirm',
-		                                 'uses' => 'app\controllers\Api\User\UserController@confirm'));
+		//Route::get('user/confirm/{key}', array('as' => 'user/confirm',
+		//                                 'uses' => 'app\controllers\Api\User\UserController@confirm'));
+
+		// по форматированию, каждый следующий отступ должен быть не больше одного "таба" (4-х символов)
+		// автоформат так не умеет, поэтому делать руками
+		// это крайне важно для легкого чтения кода, итого делаем так:
+		Route::get(
+			'user/confirm/{key}',
+			[
+				'as'   => 'user/confirm',
+				'uses' => 'app\controllers\Api\User\UserController@confirm'
+			]
+		);
 
 
 		Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');

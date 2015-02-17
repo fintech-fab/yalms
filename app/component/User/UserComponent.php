@@ -25,6 +25,9 @@ class UserComponent extends UserComponentBase
 	 */
 	public $user;
 
+	// а чего конструктор не вынесен в родительский класс?
+	// тоже можно
+
 	/**
 	 * @param null $input
 	 */
@@ -32,6 +35,10 @@ class UserComponent extends UserComponentBase
 	{
 		$this->input = empty($input) ? array() : array_map('trim', $input);
 	}
+
+	// собственные сообщения об ошибках можно делать прямо в lang-файлах
+	// и они будут подключены автоматически
+	// подробности здесь: http://laravel.com/docs/4.2/validation (Specifying Custom Messages In Language Files)
 
 	/**
 	 * Сообщения об ошибках при проверке данных
@@ -69,6 +76,17 @@ class UserComponent extends UserComponentBase
 	 */
 	public function getParameters()
 	{
+
+		// следующий шаг упрощения валидации
+		// (я понимаю что не вы это делали, но это относится ко всем местам где есть валидация)
+		// общие правила которые много где используются
+		// можно вынести в отдельный источник, например
+		// $rules = Validation::rules(['page','per_page','sort']);
+		// и там будут храниться все общеупотребительные правила
+		// а на месте если общее правило не подходит
+		// можно просто изменить:
+		// $rules['page'] = 'другое|правило';
+
 		$validator = Validator::make(
 			$this->input,
 			array(
@@ -185,6 +203,15 @@ class UserComponent extends UserComponentBase
 		 *  отправка на почту пользователя запроса для подтверждения емейла
 		 *
 		 */
+
+		// строго рекомендую сделать отдельный компонент
+		// и отправлять все письма из него
+		// иначе везде будут эта куча кода чтобы отправить емейл
+		// а могло бы быть одной строкой здесь:
+		// MailerComponent::userConform($phone);
+		// напомню что метод должен делать только то, как он называется
+		// а этот метод называется storeNewUser
+		// и он не должен делать ничего другого
 
 		$confirmURL = URL::route('user/confirm', array(Crypt::encrypt($this->input['phone'])));
 
@@ -349,6 +376,11 @@ class UserComponent extends UserComponentBase
 	 */
 	public function confirm($key)
 	{
+		// а может и не расшифроваться, тогда уйдет лишний звпрос в базу
+		// или $phone окажется пустой строкой а в базе будет пустые phone
+		// и тогда подтвердится совсем не тот пользователь
+		// очень аккуратно и продуманно делать такие операции!
+		// все данные проверять перед запросами в базу
 		$phone = Crypt::decrypt($key);
 
 		$this->user = User::where('phone', '=', $phone)->firstOrFail();
