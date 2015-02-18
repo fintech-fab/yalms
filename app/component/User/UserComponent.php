@@ -2,15 +2,12 @@
 namespace Yalms\Component\User;
 
 use Validator;
-use Input;
-use Mail;
 use Crypt;
-use URL;
 use Yalms\Models\Users\User;
 use Yalms\Models\Users\UserAdmin;
 use Yalms\Models\Users\UserStudent;
 use Yalms\Models\Users\UserTeacher;
-
+use Yalms\Component\Mailer\MailerComponent;
 
 /**
  * Class UserComponent
@@ -21,17 +18,10 @@ class UserComponent extends UserComponentBase
 {
 
 	/**
-	 * @var
+	 * @var User;
 	 */
 	public $user;
 
-	/**
-	 * @param null $input
-	 */
-	public function __construct($input = null)
-	{
-		$this->input = empty($input) ? array() : array_map('trim', $input);
-	}
 
 	/**
 	 * Сообщения об ошибках при проверке данных
@@ -145,7 +135,7 @@ class UserComponent extends UserComponentBase
 		$validator = Validator::make(
 			$this->input,
 			array(
-				'phone'    => 'required|unique:users',
+				'phone'    => 'required|digits_between:3,20|unique:users',
 				'email'    => 'email',
 				'password' => 'required|alpha_dash|min:8|confirmed'
 			),
@@ -174,27 +164,13 @@ class UserComponent extends UserComponentBase
 		try {
 			$this->saveNewUser();
 			$activeConnection->commit();
-
 		} catch (\Exception $error) {
 			$activeConnection->rollBack();
 			throw new \ErrorException('Failed to create new user');
 		}
 
-		/*
-		 *
-		 *  отправка на почту пользователя запроса для подтверждения емейла
-		 *
-		 */
 
-		$confirmURL = URL::route('user/confirm', array(Crypt::encrypt($this->input['phone'])));
-
-		$data = array('confirmURL' => $confirmURL);
-
-		$email = $this->input['email'];
-
-		Mail::queue('emails.confirm.email', $data, function ($message) use ($email) {
-			$message->to($email)->subject('Подтверждение регистрации');
-		});
+		MailerComponent::userConfirm($this->input['phone'], $this->input['email']);
 
 		return self::RESULT_OK;
 	}
@@ -351,6 +327,10 @@ class UserComponent extends UserComponentBase
 	{
 		$phone = Crypt::decrypt($key);
 
+		if (false === $phone) {
+			throw new \ErrorException('Failed input data');
+		}
+
 		$this->user = User::where('phone', '=', $phone)->firstOrFail();
 
 		$this->user->enabled = 1;
@@ -380,7 +360,7 @@ class UserComponent extends UserComponentBase
 	 *  $this->input['enabled'] 1 - включить 0 - выключить
 	 *
 	 * @return bool
-	 * @throws \ErrorException
+	 *
 	 */
 	public function switchUserProfile()
 	{
@@ -419,7 +399,9 @@ class UserComponent extends UserComponentBase
 
 				return $this->updateStudent($this->input['id']);
 
+			default :
 
+				return self::FAILED_VALIDATION;
 		}
 
 

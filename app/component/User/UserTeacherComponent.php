@@ -15,16 +15,6 @@ use Validator;
 class UserTeacherComponent extends UserComponentBase
 {
 
-
-	/**
-	 * @param null $input
-	 */
-	public function __construct($input = null)
-	{
-		$this->input = empty($input) ? array() : array_map('trim', $input);;
-	}
-
-
 	/**
 	 * сохраняет данные о преподавателе, маршрут /teacher метод POST
 	 *

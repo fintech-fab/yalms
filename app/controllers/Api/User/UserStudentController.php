@@ -9,6 +9,11 @@ use Yalms\Component\User\UserComponent;
 use Yalms\Models\Users\UserStudent;
 use Yalms\Models\Users\User;
 
+/**
+ * Class UserStudentController
+ *
+ * @package app\controllers\Api\User
+ */
 class UserStudentController extends BaseApiController
 {
 

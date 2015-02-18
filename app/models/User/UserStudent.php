@@ -23,6 +23,9 @@ use Eloquent;
 class UserStudent extends Eloquent
 {
 
+	/**
+	 * @var string
+	 */
 	protected $table = 'user_student';
 
 	/**

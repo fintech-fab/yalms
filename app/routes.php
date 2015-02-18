@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -11,12 +10,10 @@
 |
 */
 
-Route::get('/', /**
- * @return mixed
- */
-	function () {
+Route::get('/', function () {
 	return View::make('hello');
 });
+
 Route::get('/registration', 'UserSignController@register');
 /*Route::get('/loginFacebook', 'Facebook');*/
 Route::get('/loginFacebook', 'UserSignController@loginFacebook');
@@ -77,8 +74,12 @@ Route::group(array('prefix' => 'api/v1'),
 		 * параметр key содержит зашифрованный номер телефона пользователя
 		 *
 		 */
-		Route::get('user/confirm/{key}', array('as' => 'user/confirm',
-		                                 'uses' => 'app\controllers\Api\User\UserController@confirm'));
+		Route::get('user/confirm/{key}',
+			array(
+				'as'   => 'user/confirm',
+				'uses' => 'app\controllers\Api\User\UserController@confirm'
+			)
+		);
 
 
 		Route::resource('teacher', 'app\controllers\Api\User\UserTeacherController');

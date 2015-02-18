@@ -22,6 +22,9 @@ use Eloquent;
 class UserAdmin extends Eloquent
 {
 
+	/**
+	 * @var string
+	 */
 	protected $table = 'user_admin';
 
 	/**

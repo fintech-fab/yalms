@@ -4,7 +4,6 @@ namespace app\controllers\Api\User;
 use Input;
 use Response;
 use app\controllers\Api\BaseApiController;
-use Yalms\Component\User\UserSpecializationComponent;
 use Yalms\Models\Users\User;
 use Yalms\Component\User\UserComponent;
 
@@ -68,6 +67,7 @@ class UserController extends BaseApiController
 		if ($userComp->storeNewUser() == UserComponent::FAILED_VALIDATION) {
 			return $this->responseError($userComp->getMessage(), $userComp->getErrors());
 		}
+
 		return $this->show($userComp->user->id, 201);
 	}
 
@@ -151,7 +151,6 @@ class UserController extends BaseApiController
 	}
 
 
-
 	/**
 	 *
 	 *  Включение/выключение определённого профиля пользователя
@@ -180,7 +179,7 @@ class UserController extends BaseApiController
 	 * ссылка на соответствующий маршрут передаётся пользователю письмом
 	 * при его создании
 	 *
-	 * @param $key зашифрованный номер телефона пользователя
+	 * @param $key string ,зашифрованный номер телефона пользователя
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 * @throws \ErrorException

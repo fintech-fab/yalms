@@ -14,6 +14,16 @@ abstract class UserComponentBase
 	const RESULT_OK = true;
 	const FAILED_VALIDATION = false;
 
+
+	/**
+	 * @param null $input
+	 */
+	public function __construct($input = null)
+	{
+		$this->input = empty($input) ? array() : array_map('trim', $input);
+	}
+
+
 	/**
 	 * Принятые данные запроса
 	 *
