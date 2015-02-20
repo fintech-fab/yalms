@@ -327,6 +327,7 @@ class UserComponent extends UserComponentBase
 	{
 		$phone = Crypt::decrypt($key);
 
+        // а есть уверенность, что если расшифровка не удалась, то ответ будет строго false?
 		if (false === $phone) {
 			throw new \ErrorException('Failed input data');
 		}

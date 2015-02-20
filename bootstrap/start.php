@@ -26,6 +26,8 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
+    // теперь локальная среда будет определяться только на вашем компьютере
+    // а на моем, который называется homestead, больше не будет...
 	'local' => array('igoruha'),
 
 ));
