@@ -25,6 +25,9 @@ Route::resource('student', 'StudentController');
 Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
+Route::resource('registration2', 'UserSignController2@index');
+Route::resource('validatePhoneNumber', 'UserSignController2@validatePhoneNumber');
+
 Route::group(array('prefix' => 'api/v1'), function () {
 
 	\App::error(function (\Exception $exception, $code) {
@@ -55,4 +58,6 @@ Route::group(array('prefix' => 'api/v1'), function () {
 	Route::resource('student', 'app\controllers\Api\User\UserStudentController');
 
 	Route::resource('course', 'app\controllers\Api\Course\CourseController');
+
+
 });
