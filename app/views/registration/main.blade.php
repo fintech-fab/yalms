@@ -7,6 +7,7 @@
     @yield('js')
 
     <title>Регистрация пользователя</title>
+    <a href='/new-registration'>Новая регистрация</a>
 
 </head>
 <body>

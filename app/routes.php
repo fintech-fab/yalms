@@ -26,7 +26,10 @@ Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
 Route::resource('registration2', 'UserSignController2@index');
-Route::resource('validatePhoneNumber', 'UserSignController2@validatePhoneNumber');
+Route::resource('validate-phone', 'UserSignController2@validatePhoneNumber');
+Route::resource('new-registration', 'UserSignController2@newRegistration');
+Route::resource('validate-social', 'UserSignController2@validateSocialInfo');
+Route::resource('validate-missing', 'UserSignController2@validateMissingInfo');
 
 Route::group(array('prefix' => 'api/v1'), function () {
 

@@ -4,7 +4,7 @@
 
 <h2>Ввод номера телефона</h2>
 
-{{ Form::open([ 'url' => '/validatePhoneNumber' ]) }}
+{{ Form::open([ 'url' => '/validate-phone' ]) }}
 
 {{ Form::label('Phone', 'Номер телефона') }}
 {{ Form::text("phone", null, [ "placeholder" => "Номер телефона" ], Input::old("phone")) }} <br />
