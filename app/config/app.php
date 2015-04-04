@@ -124,6 +124,7 @@ return array(
 		'Way\Generators\GeneratorsServiceProvider',
         'Barryvdh\Debugbar\ServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
+		'Artdarek\OAuth\OAuthServiceProvider',
 
 
 	),
@@ -193,6 +194,7 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
         'Debugbar'        => 'Barryvdh\Debugbar\Facade',
+		'OAuth'             => 'Artdarek\OAuth\Facade\OAuth',
 
 
 	),

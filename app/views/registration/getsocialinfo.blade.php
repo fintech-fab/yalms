@@ -2,24 +2,18 @@
 
 @section('content')
 
-    <h2>Вход через соцсеть</h2>
+    <h2>Шаг 2: Вход через соцсеть</h2>
 
-    {{ Form::open([ 'url' => '/validate-social' ]) }}
+    <br>
+    <a href="/get-facebook/">Войти через Facebook</a>
+    <br>
+    <a href="/get-vc/">Войти через VK</a>
+    <br>
+    <a href="/get-google/">Войти через Google+</a>
+    <br>
+    <a href="/get-twitter/">Войти через Twitter</a>
+    <br><br>
+    <a href="/skip-social/">Пропустить</a>
 
-    {{ Form::text("first_name", null, [ "placeholder" => "Имя" ], Input::old("first_name")) }} <br />
-    {{$errors->first('first_name')}}<br />
-
-    {{ Form::text("last_name", null, [ "placeholder" => "Фамилия" ], Input::old("last_name")) }} <br />
-    {{$errors->first('last_name')}}<br />
-
-    {{ Form::text("middle_name", null, [ "placeholder" => "Отчество" ], Input::old("middle_name")) }} <br />
-    {{$errors->first('middle_name')}}<br />
-
-    {{ Form::text("email", null, [ "placeholder" => "e-mail" ], Input::old("email")) }} <br />
-    {{$errors->first('email')}}<br />
-
-
-    {{ Form::submit("Отправить") }}
-    {{ Form::close()  }}
 
 @stop

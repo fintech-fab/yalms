@@ -6,7 +6,8 @@
 	"require": {
 		"laravel/framework": "4.2.*",
 		"panique/laravel-sass": "dev-master",
-        "doctrine/dbal":"2.*"
+        "doctrine/dbal":"2.*",
+        "artdarek/oauth-4-laravel": "dev-master"
 	},
 	"require-dev": {
 		"way/generators": "2.*",

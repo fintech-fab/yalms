@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h2>Ввод номера телефона</h2>
+<h2>Шаг 1: Ввод номера телефона</h2>
 
 {{ Form::open([ 'url' => '/validate-phone' ]) }}
 

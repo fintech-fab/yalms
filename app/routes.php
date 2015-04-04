@@ -28,7 +28,11 @@ Route::resource('course', 'CourseController');
 Route::resource('registration2', 'UserSignController2@index');
 Route::resource('validate-phone', 'UserSignController2@validatePhoneNumber');
 Route::resource('new-registration', 'UserSignController2@newRegistration');
-Route::resource('validate-social', 'UserSignController2@validateSocialInfo');
+//Route::resource('validate-social', 'UserSignController2@validateSocialInfo');
+Route::resource('get-facebook', 'UserSignController2@loginWithFacebook');
+Route::resource('get-twitter', 'UserSignController2@loginWithTwitter');
+Route::resource('get-google', 'UserSignController2@loginWithGoogle');
+Route::resource('skip-social', 'UserSignController2@skipSocial');
 Route::resource('validate-missing', 'UserSignController2@validateMissingInfo');
 
 Route::group(array('prefix' => 'api/v1'), function () {
