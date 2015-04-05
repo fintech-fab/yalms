@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <h2>Ввод оставшихся данных</h2>
+    <h2>Шаг 3: Ввод оставшихся данных</h2>
 
     {{ Form::open([ 'url' => '/validate-missing' ]) }}
 

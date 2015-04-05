@@ -7,11 +7,7 @@
     <br>
     <a href="/get-facebook/">Войти через Facebook</a>
     <br>
-    <a href="/get-vc/">Войти через VK</a>
-    <br>
-    <a href="/get-google/">Войти через Google+</a>
-    <br>
-    <a href="/get-twitter/">Войти через Twitter</a>
+    <a href="/get-vk/">Войти через VK</a>
     <br><br>
     <a href="/skip-social/">Пропустить</a>
 
