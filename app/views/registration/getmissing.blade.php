@@ -1,35 +1,74 @@
 @extends('registration.main')
 
+@section('js')
+    <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+@stop
+
 @section('content')
 
     <h2>Шаг 3: Ввод оставшихся данных</h2>
 
-    {{ Form::open([ 'url' => '/validate-missing' ]) }}
+    {{ Form::open(array('url' => '#', 'class' => 'MyForm')) }}
 
-    @if (!Session::has('first_name') or Session::get('first_name')=="")
+    {{ Form::text("last_name", Session::get('last_name'), [ "placeholder" => "Фамилия" ], Input::old("last_name")) }} <br />
+    <div class="error" id="last_name"></div>
 
-    {{ Form::text("first_name", null, [ "placeholder" => "Имя" ], Input::old("first_name")) }} <br />
-    {{$errors->first('first_name')}}<br />
+    {{ Form::text("first_name", Session::get('first_name'), [ "placeholder" => "Имя" ], Input::old("first_name")) }} <br />
+    <div class="error" id="first_name"></div>
 
-    @endif
+    {{ Form::text("middle_name", Session::get('middle_name'), [ "placeholder" => "Отчество" ], Input::old("middle_name")) }} <br />
+    <div class="error" id="middle_name"></div>
 
-    @if (!Session::has('last_name') or Session::get('last_name')=="")
-    {{ Form::text("last_name", null, [ "placeholder" => "Фамилия" ], Input::old("last_name")) }} <br />
-    {{$errors->first('last_name')}}<br />
-    @endif
+    {{ Form::text("phone", Session::get('phone'), [ "placeholder" => "Телефон" ], Input::old("middle_name")) }} <br />
+    <div class="error" id="phone"></div>
 
-    @if (!Session::has('middle_name') or Session::get('middle_name')=="")
-    {{ Form::text("middle_name", null, [ "placeholder" => "Отчество" ], Input::old("middle_name")) }} <br />
-    {{$errors->first('middle_name')}}<br />
-    @endif
+    {{ Form::text("email", Session::get('email'), [ "placeholder" => "e-mail" ], Input::old("email")) }} <br />
+    <div class="error" id="email"></div>
 
-    @if (!Session::has('email') or Session::get('email')=="")
-    {{ Form::text("email", null, [ "placeholder" => "e-mail" ], Input::old("email")) }} <br />
-    {{$errors->first('email')}}<br />
-    @endif
+    {{ Form::text("password", Null, [ "placeholder" => "пароль" ]) }} <br />
+    <div class="error" id="password"ошибки нет></div>
 
+    {{ Form::text("password_confirmation", Null, [ "placeholder" => "повторить пароль" ]) }} <br />
+    <div class="error" id="password_confirmation"></div>
 
     {{ Form::submit("Отправить") }}
     {{ Form::close()  }}
+
+    <script type="text/javascript">
+        $(".MyForm").submit(function(e) {
+
+            $('div.error').text("");
+            e.preventDefault();
+
+            var form = $('.MyForm');
+            var url = "http://yalms.dev:8000/api/v1/user"; // the script where you handle the form input.
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: url,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data) {
+//                    console.log(data);
+                    if('errors' in data){
+                        $('#last_name').text(data.errors.last_name);
+                        $('#first_name').text(data.errors.first_name);
+                        $('#middle_name').text(data.errors.middle_name);
+                        $('#phone').text(data.errors.phone);
+                        $('#email').text(data.errors.email);
+                        $('#password').text(data.errors.password);
+                        $('#password_confirmation').text(data.errors.password_confirmation);
+                    }
+                    else{
+                        window.location.replace("/finish");
+                    }
+                },
+                error: function(data){
+                    console.log(data);
+//                    $('div.error').text("ошибка!");
+                }
+            });
+        });
+    </script>
 
 @stop

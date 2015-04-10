@@ -32,6 +32,7 @@ Route::resource('get-facebook', 'UserSignController2@loginWithFacebook');
 Route::resource('get-vk', 'UserSignController2@loginWithVK');
 Route::resource('skip-social', 'UserSignController2@skipSocial');
 Route::resource('validate-missing', 'UserSignController2@validateMissingInfo');
+Route::resource('finish', 'UserSignController2@finish');
 
 Route::group(array('prefix' => 'api/v1'), function () {
 
