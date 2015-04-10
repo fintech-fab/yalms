@@ -1,28 +1,140 @@
 <?php
 
+Use app\controllers\Api\User\UserController;
+
 
 class UserSignController2 extends BaseController
 {
 
 	public function index()
-    {
-	    if (!Session::has('phone')) {
-		    return $this->getPhoneNumber();
-	    }
+	{
+		if (!Session::has('phone')) {
+			return $this->getPhoneNumber();
+		}
 
-	    if (!Session::has('socialInfo')) {
-		    return $this->getSocialInfo();
+		if (!Session::has('socialInfo')) {
+			return $this->getSocialInfo();
 //		    return $this->loginWithFacebook();
-	    }
+		}
 
 		if (!Session::has('missingInfo')) {
 			return $this->getMissingInfo();
 		}
 
-	    $data = Session::all();
+		$data = Session::all();
 
 		return View::make('registration.summary', ['data' => $data]);
-    }
+
+		/*
+				//отправка данных на регистрацию
+				$r = new HttpRequest('http://yalms.dev:8000/api/v1/user', HttpRequest::METH_POST);
+		//	    $r->setOptions(array('cookies' => array('lang' => 'de')));
+				$r->addPostFields(array(
+					'first_name' => 'Василий',
+					'last_name' => 'Васильев',
+					'middle_name' => 'Васильевич',
+					'phone' => '79287213650',
+					'email' => 'vas@mail.ru'
+				));
+		//	    $r->addPostFile('image', 'profile.jpg', 'image/jpeg');
+				try {
+					echo $r->send()->getBody();
+				} catch (HttpException $ex) {
+					echo $ex;
+				}
+
+
+
+
+				$url = 'http://yalms.dev:8000/api/v1/user';
+				$data = array(
+					'first_name' => 'Василий',
+					'last_name' => 'Васильев',
+					'middle_name' => 'Васильевич',
+					'phone' => '79287213650',
+					'email' => 'vas@mail.ru'
+				);
+
+				$options = array(
+					'http' => array(
+						'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+						'method'  => 'POST',
+						'content' => http_build_query($data),
+					),
+				);
+				$context  = stream_context_create($options);
+				$result = file_get_contents($url, false, $context);
+
+				var_dump($result);
+
+
+				$content = http_build_query (array (
+					'first_name' => 'Василий',
+					'last_name' => 'Васильев',
+					'middle_name' => 'Васильевич',
+					'phone' => '79287213650',
+					'email' => 'vas@mail.ru'
+				));
+
+				$context = stream_context_create (array (
+					'http' => array (
+						'method' => 'POST',
+						'content' => $content,
+					)
+				));
+
+				$result = file_get_contents('http://yalms.dev:8000/api/v1/user', null, $context);
+
+				var_dump($result);
+
+
+
+
+		$params = array(
+			'first_name' => 'Василий',
+			'last_name' => 'Васильев',
+			'middle_name' => 'Васильевич',
+			'phone' => '79287213650',
+			'email' => 'vas@mail.ru'
+		);
+		*/
+//		echo $this->httpPost(" ", $params);
+
+
+	}
+
+	/*
+	public function httpPost($url, $params)
+		{
+			$postData = '';
+			//create name value pairs seperated by &
+			foreach ($params as $k => $v) {
+				$postData .= $k . '=' . $v . '&';
+			}
+			rtrim($postData, '&');
+
+			$ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HEADER, false);
+			curl_setopt($ch, CURLOPT_POST, count($postData));
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+			$output = curl_exec($ch);
+
+			echo 'Ошибка curl: ' . curl_error($ch);
+
+			curl_close($ch);
+
+			return $output;
+
+		}
+*/
+
+
+//		return View::make('registration.summary', ['data' => $data]);
+
 
 	public function newRegistration()
 	{
