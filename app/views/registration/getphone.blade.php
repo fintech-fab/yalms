@@ -2,15 +2,25 @@
 
 @section('content')
 
-<h2>Шаг 1: Ввод номера телефона</h2>
+<h4>Шаг 1: Ввод номера телефона</h4>
+<br>
 
-{{ Form::open([ 'url' => '/validate-phone' ]) }}
+{{ Form::open([ 'url' => '/validate-phone', 'class' => 'form-horizontal']) }}
+    <div class="form-group">
+        {{ Form::label('Phone', 'Номер телефона', ['class' => 'col-sm-2 control-label']) }}
+        <div class="col-sm-5">
+            {{ Form::text("phone", null, [ "placeholder" => "Номер телефона", 'class' => 'form-control' ], Input::old("phone")) }}
+        </div>
+        {{$errors->first('phone')}}<br />
+    </div>
 
-{{ Form::label('Phone', 'Номер телефона') }}
-{{ Form::text("phone", null, [ "placeholder" => "Номер телефона" ], Input::old("phone")) }} <br />
-{{$errors->first('phone')}}<br />
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-5">
+            {{ Form::submit("Отправить", ['class' => 'btn btn-primary']) }}
+        </div>
+    </div>
 
-{{ Form::submit("Отправить") }}
+
 {{ Form::close()  }}
 
 @stop
