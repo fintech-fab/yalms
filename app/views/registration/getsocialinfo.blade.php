@@ -11,5 +11,4 @@
     <br><br>
     <a class="btn btn-danger" href="/skip-social/">Пропустить</a>
 
-
 @stop

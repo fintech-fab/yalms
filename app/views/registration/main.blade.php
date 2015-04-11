@@ -10,9 +10,6 @@
     {{ HTML::script('js/jquery-2.1.1.js') }}
     {{ HTML::script('bootstrap/js/bootstrap.min.js') }}
 
-
-    {{--@yield('css')--}}
-    {{--@yield('js')--}}
     <style>
         @section('styles')
         body {
@@ -29,24 +26,24 @@
 </head>
 <body>
 
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <div class="navbar-brand">Регистрация пользователя</div>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-brand">Регистрация пользователя</div>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href='/new-registration'>Новая регистрация</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href='/new-registration'>Новая регистрация</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+    </nav>
 
     @yield('content')
 

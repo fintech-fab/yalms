@@ -15,13 +15,7 @@ class UserSignController2 extends BaseController
 			return $this->getSocialInfo();
 		}
 
-//		if (!Session::has('missingInfo')) {
-			return $this->getMissingInfo();
-//		}
-
-//		$data = Session::all();
-
-//		return View::make('registration.summary', ['data' => $data]);
+		return $this->getMissingInfo();
 	}
 
 	public function newRegistration()
@@ -71,49 +65,6 @@ class UserSignController2 extends BaseController
 	    return View::make('registration.finish');
     }
 
-//	public function validateMissingInfo()
-//	{
-//		$data = Input::all();
-//
-//		$validateFields = array_keys($data);
-//		$key = array_search('_token', $validateFields);
-//		if ($key !== false)
-//			unset($validateFields[$key]);
-//
-//		$rules = $this::validasionRules($validateFields);
-//		$val = Validator::make($data, $rules);
-//
-//		if( $val->fails())
-//		{
-//			return Redirect::back()->withErrors($val)->withInput();
-//		}
-//
-//		foreach($data as $key=>$element){
-//			Session::put($key, $element);
-//		}
-//
-//		Session::put('missingInfo', '1');
-//		return Redirect::to('registration2');
-//	}
-
-//	public static function validasionRules($elements = null)
-//	{
-//		$allElements = [
-//			'phone' => 'required|min:11',
-//			'first_name' => 'required|min:5',
-//			'last_name' => 'required|min:5',
-//			'middle_name' => 'min:5',
-//			'email' => 'email',
-//		];
-//		if ($elements == null){
-//			return $allElements;
-//		}
-//		$requiredElements = array();
-//		foreach($elements as $element){
-//			$requiredElements[$element] = $allElements[$element];
-//		}
-//		return $requiredElements;
-//	}
 
 	/**
 	 * Login user with facebook
@@ -143,10 +94,6 @@ class UserSignController2 extends BaseController
 			$message = 'Your unique facebook user id is: ' . $result['id'] . ' and your name is ' . $result['name'];
 			echo $message. "<br/>";
 
-			//Var_dump
-			//display whole array().
-//			dd($result);
-
 			foreach($result as $key=>$element){
 				Session::put($key, $element);
 			}
@@ -162,7 +109,6 @@ class UserSignController2 extends BaseController
 			// return to facebook login url
 			return Redirect::to( (string)$url );
 		}
-
 	}
 
 	public function loginWithVK() {
@@ -184,13 +130,11 @@ class UserSignController2 extends BaseController
 			// Send a request with it
 			$result = json_decode( $VKService->request( 'https://api.vk.com/method/users.get' ), true );
 
-
 			foreach($result['response'][0] as $key=>$element){
 				Session::put($key, $element);
 			}
 			Session::put('socialInfo', 'Vkontakte');
 			return Redirect::to('registration2');
-
 		}
 		// if not ask for permission first
 		else {
@@ -201,6 +145,5 @@ class UserSignController2 extends BaseController
 			return Redirect::to( (string)$url );
 		}
 	}
-
 
 }
