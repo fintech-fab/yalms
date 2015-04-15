@@ -186,7 +186,8 @@ class UserComponent
 				'middle_name',
 				'last_name',
 				'email',
-				'password'
+				'password',
+				'social_network'
 			)
 		);
 

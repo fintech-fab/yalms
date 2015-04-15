@@ -27,6 +27,7 @@
             <div class="error" id={{ $key }}></div>
         </div>
     @endforeach
+    {{ Form::hidden('social_network', Session::get('socialInfo')) }}
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-5">
