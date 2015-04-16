@@ -65,5 +65,7 @@ Route::group(array('prefix' => 'api/v1'), function () {
 
 	Route::resource('course', 'app\controllers\Api\Course\CourseController');
 
+	Route::post('profile', 'app\controllers\Api\User\UserController@changeProfile');
+
 
 });

@@ -1,11 +1,11 @@
 <?php
 namespace app\controllers\Api\User;
 
+use app\controllers\Api\BaseApiController;
 use Input;
 use Response;
-use app\controllers\Api\BaseApiController;
-use Yalms\Models\Users\User;
 use Yalms\Component\User\UserComponent;
+use Yalms\Models\Users\User;
 
 
 class UserController extends BaseApiController
@@ -150,5 +150,17 @@ class UserController extends BaseApiController
 		return $this->responseSuccess($userComponent->getMessage());
 	}
 
+
+	public function changeProfile()
+	{
+		$userComp = new UserComponent(Input::only('id', 'role', 'flag'));
+
+
+		if ($userComp->changeProfile() == UserComponent::FAILED_VALIDATION) {
+			return $this->responseError($userComp->getMessage(), $userComp->getErrors());
+		}
+
+		return $this->show($userComp->user->id, 201);
+	}
 
 }
