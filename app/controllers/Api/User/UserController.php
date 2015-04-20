@@ -150,7 +150,13 @@ class UserController extends BaseApiController
 		return $this->responseSuccess($userComponent->getMessage());
 	}
 
-
+	// здесь и везде по коду нет комментариев
+	// что делает этот метод?
+	// как мне понять его назначение?
+	// почему метод называется changeProfile, ведь он не меняет никаких профилей?
+	// он просто выдает информацию по аккаунту, но по названию - он меняет профиль
+	// крайне важное правило - давать названия классам, методам, функциям
+	// в соответствии тому, что они делают
 	public function changeProfile()
 	{
 		$userComp = new UserComponent(Input::only('id', 'role', 'flag'));

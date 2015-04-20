@@ -25,6 +25,10 @@ Route::resource('student', 'StudentController');
 Route::resource('teacher', 'TeacherController');
 Route::resource('course', 'CourseController');
 
+// читать и перечитывать документацию по роутингу
+// совсем неправильно здесь использовано
+// ресурс должен указывать на целый контроллер (как выше)
+// а не на отдельные его методы (!!!)
 Route::resource('registration2', 'UserSignController2@index');
 Route::resource('validate-phone', 'UserSignController2@validatePhoneNumber');
 Route::resource('new-registration', 'UserSignController2@newRegistration');
