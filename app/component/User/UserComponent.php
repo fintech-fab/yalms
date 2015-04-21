@@ -24,54 +24,29 @@ class UserComponent
 	 * @var array
 	 */
 	private $input = array();
-
-	public function __construct($input = null)
-	{
-		$this->input = empty($input) ? array() : $input;
-	}
-
 	/**
 	 * @var string Сообщение о результате выполненных операций
 	 */
 	private $message = '';
-
-	/**
-	 * @return string Сообщение о результате выполненных операций
-	 */
-	public function getMessage()
-	{
-		return $this->message;
-	}
-
 	/**
 	 * @var array Сообщение об ошибках проверки данных (Валидатора)
 	 */
 	private $errors = array();
-
-	/**
-	 * @return array Сообщение об ошибках проверки данных (Валидатора)
-	 */
-	public function getErrors()
-	{
-		return $this->errors;
-	}
-
 	/**
 	 * Сообщения об ошибках при проверке данных
 	 *
 	 * @var array
 	 */
 	private $errorMessages = array(
-		'required'   => 'Поле должно быть заполнено обязательно!',
-		'unique'     => ':attribute с таким значением уже есть.',
-		'email'      => 'Должен быть корректный адрес электронной почты.',
-		'alpha_dash' => 'Должны быть только латинские символы, цифры, знаки подчёркивания (_) и дефисы (-).',
+		'required'           => 'Поле должно быть заполнено обязательно!',
+		'unique'             => ':attribute с таким значением уже есть.',
+		'email'              => 'Должен быть корректный адрес электронной почты.',
+		'alpha_dash'         => 'Должны быть только латинские символы, цифры, знаки подчёркивания (_) и дефисы (-).',
 		'confirmed'          => 'Подтверждение для :attribute не выполнено.',
 		'password.confirmed' => 'Пароли не совпадают.',
 		'min'                => ':attribute должен быть не меньше :min символов',
 		'password.min'       => 'Пароль должен быть не меньше :min символов'
 	);
-
 	/**
 	 * Массив параметров запроса со значениями по умолчанию (название параметра => значение)
 	 *
@@ -83,6 +58,66 @@ class UserComponent
 		'direction' => 'desc',
 		'state'     => 'enabled'
 	);
+
+	public function __construct($input = null)
+	{
+		$this->input = empty($input) ? array() : $input;
+	}
+
+	/**
+	 * @return string Сообщение о результате выполненных операций
+	 */
+	public function getMessage()
+	{
+		return $this->message;
+	}
+
+	/**
+	 * @return array Сообщение об ошибках проверки данных (Валидатора)
+	 */
+	public function getErrors()
+	{
+		return $this->errors;
+	}
+
+	/**
+	 * Выдает список пользователей,
+	 * с выборкой по полю enabled, либо всех пользователей.
+	 *
+	 * Параметры:
+	 * state = enabled|disabled|all      выборка по полю "enabled", значение по умолчанию "enabled"
+	 * sort = created|updated            Сортировка по полю  "created_at" или "updated_at", по умолчанию "created"
+	 * direction = asc|desc              Направление сортировки, по умолчанию "desc"
+	 *
+	 * Для использования параметров запроса — предваритрельн вызвать "validateParameters()"
+	 *
+	 * Постранично. Параметры запроса страниц (не обязательные):
+	 *      page — N страницы,
+	 *      per_page — количество на странице.
+	 *
+	 * @return \Illuminate\Pagination\Paginator
+	 */
+	public function showUsers()
+	{
+		$params = $this->getParameters();
+
+		$users = null;
+		if ($params->state == 'all') {
+			$users = User::with('teacher', 'student', 'admin')->orderBy($params->sort, $params->direction)->paginate(
+				$params->per_page,
+				array('id', 'first_name', 'middle_name', 'last_name', 'created_at', 'updated_at')
+			);
+		} else {
+			$users = User::with('teacher', 'student', 'admin')->whereEnabled($params->state)
+				->orderBy($params->sort, $params->direction)->paginate(
+					$params->per_page,
+					array('id', 'first_name', 'middle_name', 'last_name', 'created_at', 'updated_at')
+				);
+		}
+
+		return $users;
+	}
+
 	/**
 	 * Проверка параметров запроса множественных данных (страницы, сортировка и пр.)
 	 * и установка значений по умолчанию
@@ -119,44 +154,6 @@ class UserComponent
 	}
 
 	/**
-	 * Выдает список пользователей,
-	 * с выборкой по полю enabled, либо всех пользователей.
-	 *
-	 * Параметры:
-	 * state = enabled|disabled|all      выборка по полю "enabled", значение по умолчанию "enabled"
-	 * sort = created|updated            Сортировка по полю  "created_at" или "updated_at", по умолчанию "created"
-	 * direction = asc|desc              Направление сортировки, по умолчанию "desc"
-	 *
-	 * Для использования параметров запроса — предваритрельн вызвать "validateParameters()"
-	 *
-	 * Постранично. Параметры запроса страниц (не обязательные):
-	 *      page — N страницы,
-	 *      per_page — количество на странице.
-	 *
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	public function showUsers()
-	{
-		$params = $this->getParameters();
-
-		$users = null;
-		if ($params->state == 'all') {
-			$users = User::with('teacher', 'student', 'admin')->orderBy($params->sort, $params->direction)->paginate(
-				$params->per_page,
-				array('id', 'first_name', 'middle_name', 'last_name', 'created_at', 'updated_at')
-				);
-		} else {
-			$users = User::with('teacher', 'student', 'admin')->whereEnabled($params->state)
-				->orderBy($params->sort, $params->direction)->paginate(
-					$params->per_page,
-					array('id', 'first_name', 'middle_name', 'last_name', 'created_at', 'updated_at')
-				);
-		}
-
-		return $users;
-	}
-
-	/**
 	 * Сохранение принятых данных для нового пользователя
 	 *
 	 * @return bool
@@ -186,7 +183,8 @@ class UserComponent
 				'middle_name',
 				'last_name',
 				'email',
-				'password'
+				'password',
+				'social_network'
 			)
 		);
 
@@ -204,6 +202,63 @@ class UserComponent
 		return self::RESULT_OK;
 	}
 
+	/**
+	 * Ошибки валидатора записываются в сообщение
+	 *
+	 * @param object $validator
+	 */
+	private function setValidatorMessage($validator)
+	{
+		$this->message = 'Найдены ошибки при проверке данных';
+		$this->errors = $validator->messages();
+	}
+
+	/**
+	 * Заполнение принятых данных пользователя в модель БД
+	 *
+	 * @param array $fields
+	 *
+	 * @return bool
+	 */
+	private function prepareToSave($fields = array())
+	{
+		$areThereData = false;
+		foreach ($fields as $field) {
+			if (!empty($this->input[$field])) {
+				$this->user->$field = $this->input[$field];
+				$areThereData = true;
+			}
+		}
+		if (!$areThereData) {
+			$this->message = 'No data.';
+		}
+
+		return $areThereData;
+	}
+
+	/**
+	 * @throws \ErrorException
+	 */
+	private function saveNewUser()
+	{
+		$isSaved = $this->user->save();
+
+		$admin = new UserAdmin;
+		$admin->user_id = $this->user->id;
+		$isSaved &= $admin->save();
+
+		$teacher = new UserTeacher;
+		$teacher->user_id = $this->user->id;
+		$isSaved &= $teacher->save();
+
+		$student = new UserStudent;
+		$student->user_id = $this->user->id;
+		$isSaved &= $student->save();
+		if (!$isSaved) {
+			throw new \ErrorException('This user is not saved');
+		}
+		$this->message = 'Данные успешно сохранены';
+	}
 
 	/**
 	 *  Обновление данных пользователя, с указанным id
@@ -277,52 +332,11 @@ class UserComponent
 	}
 
 
-	/**
-	 * Заполнение принятых данных пользователя в модель БД
-	 *
-	 * @param array $fields
-	 *
-	 * @return bool
-	 */
-	private function prepareToSave($fields = array())
-	{
-		$areThereData = false;
-		foreach ($fields as $field) {
-			if (!empty($this->input[$field])) {
-				$this->user->$field = $this->input[$field];
-				$areThereData = true;
-			}
-		}
-		if (!$areThereData) {
-			$this->message = 'No data.';
-		}
 
-		return $areThereData;
-	}
 
-	/**
-	 * @throws \ErrorException
-	 */
-	private function saveNewUser()
-	{
-		$isSaved = $this->user->save();
-
-		$admin = new UserAdmin;
-		$admin->user_id = $this->user->id;
-		$isSaved &= $admin->save();
-
-		$teacher = new UserTeacher;
-		$teacher->user_id = $this->user->id;
-		$isSaved &= $teacher->save();
-
-		$student = new UserStudent;
-		$student->user_id = $this->user->id;
-		$isSaved &= $student->save();
-		if (!$isSaved) {
-			throw new \ErrorException('This user is not saved');
-		}
-		$this->message = 'Данные успешно сохранены';
-	}
+	//*********************************
+	// Профайлы пользователя
+	//*********************************
 
 	/**
 	 * @throws \ErrorException
@@ -339,13 +353,6 @@ class UserComponent
 		}
 		$this->message = 'Данные успешно удалены';
 	}
-
-
-
-
-	//*********************************
-	// Профайлы пользователя
-	//*********************************
 
 	/**
 	 *  Обновление данных профиля пользователя "Admin", с указанным id
@@ -369,6 +376,25 @@ class UserComponent
 		$this->message = 'Данные успешно сохранены';
 
 		return self::RESULT_OK;
+	}
+
+	private function validateProfile()
+	{
+		$validator = Validator::make(
+			$this->input,
+			array('enabled' => 'required|in:0,1'),
+			array(
+				'required' => 'Поле должно быть заполнено обязательно!',
+				'in'       => 'Введено некорректное значение.'
+			)
+		);
+		if ($validator->fails()) {
+			$this->setValidatorMessage($validator);
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -419,34 +445,39 @@ class UserComponent
 		return self::RESULT_OK;
 	}
 
-	private function validateProfile()
+	public function changeProfile()
 	{
 		$validator = Validator::make(
 			$this->input,
-			array('enabled' => 'required|in:0,1'),
 			array(
-				'required' => 'Поле должно быть заполнено обязательно!',
-				'in'       => 'Введено некорректное значение.'
-			)
+				'role' => 'in:admin,student,teacher',
+				'flag' => 'in:0,1'
+			),
+			$this->errorMessages
 		);
 		if ($validator->fails()) {
 			$this->setValidatorMessage($validator);
 
-			return false;
+			return self::FAILED_VALIDATION;
 		}
 
-		return true;
-	}
+		$this->user = User::findOrFail($this->input['id']);
 
-	/**
-	 * Ошибки валидатора записываются в сообщение
-	 *
-	 * @param object $validator
-	 */
-	private function setValidatorMessage($validator)
-	{
-		$this->message = 'Найдены ошибки при проверке данных';
-		$this->errors = $validator->messages();
+		switch ($this->input['role']) {
+			case 'admin':
+				$profile = UserAdmin::where('user_id', '=', $this->input['id'])->firstOrFail();//
+				break;
+			case 'student':
+				$profile = UserStudent::where('user_id', '=', $this->input['id'])->firstOrFail();//
+				break;
+			case 'teacher':
+				$profile = UserTeacher::where('user_id', '=', $this->input['id'])->firstOrFail();//
+				break;
+		}
+		$profile->enabled = $this->input['flag'];
+		$profile->save();
+
+		return self::RESULT_OK;
 	}
 
 
